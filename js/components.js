@@ -48,7 +48,6 @@ function footerHTML(){
           <a href="#" data-i18n="foot_about">About</a>
           <a href="#" data-i18n="foot_contact">Contact</a>
           <a href="#" data-i18n="foot_careers">Careers</a>
-          <a href="admin.html">Admin</a>
         </div>
         <div>
           <h4 data-i18n="foot_legal">Legal</h4>
