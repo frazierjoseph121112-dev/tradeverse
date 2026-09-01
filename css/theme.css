@@ -4,11 +4,13 @@
    ===================================================================== */
 
 :root {
-  /* Brand accent — primary cyan/blue */
-  --accent: #00b8d4;
-  --accent-2: #0a84ff;
-  --accent-grad: linear-gradient(135deg, #0a84ff 0%, #00b8d4 100%);
-  --accent-grad-soft: linear-gradient(135deg, rgba(10,132,255,.18), rgba(0,184,212,.18));
+  /* Brand accent — deep blue (richer, more premium) */
+  --accent: #0a3d91;
+  --accent-2: #0d52c7;
+  --accent-3: #1e6fe6;
+  --accent-grad: linear-gradient(135deg, #0a3d91 0%, #0d52c7 55%, #1e6fe6 100%);
+  --accent-grad-soft: linear-gradient(135deg, rgba(10,61,145,.16), rgba(30,111,230,.16));
+  --accent-glow: 0 8px 28px rgba(13,82,199,.32);
 
   /* Pink/magenta accent — OANDA TMS inspired */
   --pink: #e91e80;
@@ -56,25 +58,25 @@
   --nav-bg: rgba(7,13,26,.82);
 }
 
-/* ---------- LIGHT ---------- */
+/* ---------- LIGHT (blue & white — landing default) ---------- */
 [data-theme="light"] {
-  --bg: #f4f7fc;
-  --bg-2: #ffffff;
-  --bg-3: #eef3fb;
+  --bg: #ffffff;
+  --bg-2: #f4f7fc;
+  --bg-3: #eaf1fb;
   --card: #ffffff;
   --card-2: #f7faff;
   --elev: #ffffff;
-  --border: rgba(15,23,42,.10);
-  --border-2: rgba(15,23,42,.16);
-  --text: #0b1a36;
-  --text-2: #46587e;
-  --text-3: #8190b0;
-  --muted: #9aa7c4;
-  --chip: rgba(15,23,42,.05);
-  --glass: rgba(255,255,255,.8);
-  --nav-bg: rgba(255,255,255,.85);
-  --shadow: 0 10px 40px rgba(15,23,42,.12);
-  --shadow-soft: 0 6px 20px rgba(15,23,42,.08);
+  --border: rgba(10,40,95,.10);
+  --border-2: rgba(10,40,95,.18);
+  --text: #0a1b3d;
+  --text-2: #43557d;
+  --text-3: #7d8aa8;
+  --muted: #94a2c0;
+  --chip: rgba(13,82,199,.06);
+  --glass: rgba(255,255,255,.88);
+  --nav-bg: rgba(255,255,255,.9);
+  --shadow: 0 12px 44px rgba(10,40,95,.10);
+  --shadow-soft: 0 6px 22px rgba(10,40,95,.07);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -125,8 +127,8 @@ h1, h2, h3, h4 { line-height: 1.2; font-weight: 800; letter-spacing: -0.02em; }
   white-space: nowrap;
 }
 .btn:active { transform: translateY(1px) scale(.99); }
-.btn-primary { background: var(--accent-grad); color: #fff; box-shadow: 0 8px 24px rgba(0,184,212,.32); }
-.btn-primary:hover { box-shadow: 0 10px 32px rgba(0,184,212,.5); }
+.btn-primary { background: var(--accent-grad); color: #fff; box-shadow: var(--accent-glow); }
+.btn-primary:hover { box-shadow: 0 12px 36px rgba(13,82,199,.5); transform: translateY(-2px); }
 .btn-ghost { background: var(--chip); color: var(--text); border: 1px solid var(--border-2); }
 .btn-ghost:hover { background: var(--card-2); }
 .btn-outline { background: transparent; color: var(--text); border: 1.5px solid var(--border-2); }
@@ -167,7 +169,7 @@ h1, h2, h3, h4 { line-height: 1.2; font-weight: 800; letter-spacing: -0.02em; }
 .brand-mark {
   width: 34px; height: 34px; border-radius: 10px; background: var(--accent-grad);
   display: grid; place-items: center; color: #fff; font-weight: 900;
-  box-shadow: 0 6px 18px rgba(0,184,212,.4);
+  box-shadow: var(--accent-glow);
 }
 .nav-links { display: flex; gap: 22px; margin-left: 14px; }
 .nav-links a { color: var(--text-2); font-weight: 600; font-size: .92rem; transition: color .15s; }
@@ -202,8 +204,13 @@ h1, h2, h3, h4 { line-height: 1.2; font-weight: 800; letter-spacing: -0.02em; }
 .hero { position: relative; padding: 70px 0 90px; overflow: hidden; }
 .hero-bg-glow {
   position: absolute; inset: 0; pointer-events: none;
-  background: radial-gradient(60% 60% at 80% 10%, rgba(0,184,212,.18), transparent 60%),
-              radial-gradient(50% 50% at 10% 90%, rgba(10,132,255,.15), transparent 60%);
+  background: radial-gradient(60% 60% at 80% 10%, rgba(30,111,230,.18), transparent 60%),
+              radial-gradient(50% 50% at 10% 90%, rgba(10,61,145,.15), transparent 60%);
+}
+/* White landing hero accent — subtle blue mesh on white */
+[data-theme="light"] .hero-bg-glow {
+  background: radial-gradient(60% 60% at 85% 5%, rgba(30,111,230,.12), transparent 60%),
+              radial-gradient(45% 50% at 5% 95%, rgba(10,61,145,.10), transparent 60%);
 }
 .hero-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items: center; }
 .hero-img { position: relative; }
@@ -231,7 +238,7 @@ h1, h2, h3, h4 { line-height: 1.2; font-weight: 800; letter-spacing: -0.02em; }
 @media (max-width: 980px) { .acct-grid { grid-template-columns: repeat(2,1fr); } }
 @media (max-width: 560px) { .acct-grid { grid-template-columns: 1fr; } }
 .acct-card { padding: 26px 22px; position: relative; }
-.acct-card.feat { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 14px 40px rgba(0,184,212,.18); }
+.acct-card.feat { border-color: var(--accent-2); box-shadow: 0 0 0 1px var(--accent-2), 0 14px 40px rgba(13,82,199,.18); }
 .acct-card .price { font-size: 2rem; font-weight: 800; }
 .acct-card ul { list-style: none; margin: 16px 0; }
 .acct-card li { display: flex; gap: 10px; padding: 7px 0; color: var(--text-2); font-size: .9rem; }
@@ -304,7 +311,7 @@ h1, h2, h3, h4 { line-height: 1.2; font-weight: 800; letter-spacing: -0.02em; }
 .watch-item:last-child { border: none; }
 
 /* support chat widget */
-.chat-fab { position: fixed; bottom: 24px; right: 24px; width: 58px; height: 58px; border-radius: 50%; background: var(--accent-grad); color: #fff; display: grid; place-items: center; font-size: 1.5rem; box-shadow: 0 10px 30px rgba(0,184,212,.45); z-index: 200; cursor: pointer; }
+.chat-fab { position: fixed; bottom: 24px; right: 24px; width: 58px; height: 58px; border-radius: 50%; background: var(--accent-grad); color: #fff; display: grid; place-items: center; font-size: 1.5rem; box-shadow: var(--accent-glow); z-index: 200; cursor: pointer; }
 .chat-panel { position: fixed; bottom: 96px; right: 24px; width: 360px; max-width: calc(100vw - 32px); height: 480px; max-height: calc(100vh - 140px); background: var(--card); border: 1px solid var(--border-2); border-radius: var(--r); box-shadow: var(--shadow); display: flex; flex-direction: column; z-index: 200; overflow: hidden; }
 .chat-head { padding: 16px; background: var(--accent-grad); color: #fff; display: flex; align-items: center; gap: 10px; }
 .chat-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
@@ -433,3 +440,84 @@ h1, h2, h3, h4 { line-height: 1.2; font-weight: 800; letter-spacing: -0.02em; }
 .referral-badge-completed { background: var(--pink-grad-soft); color: var(--pink); padding: 4px 12px; border-radius: 999px; font-size: .76rem; font-weight: 700; }
 .copy-btn { background: var(--pink-grad); color: #fff; border-radius: 8px; padding: 8px 16px; font-size: .85rem; font-weight: 700; cursor: pointer; border: none; white-space: nowrap; transition: transform .15s; }
 .copy-btn:hover { transform: translateY(-1px); }
+
+/* =====================================================================
+   BLUE & WHITE LANDING — deep blue accents on clean white
+   ===================================================================== */
+
+/* Refined section heading with deep-blue underline accent */
+.section .h2 { position: relative; }
+.center .h2::after {
+  content: ''; display: block; width: 56px; height: 4px; border-radius: 999px;
+  background: var(--accent-grad); margin: 16px auto 0;
+}
+
+/* Hero on white: bigger, bolder headline with deep-blue gradient word */
+[data-theme="light"] .hero { padding: 84px 0 100px; }
+[data-theme="light"] .hero .h1 { font-weight: 800; }
+[data-theme="light"] .hero .grad-text {
+  background: var(--accent-grad);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Clean white cards with a soft blue hover lift on landing */
+[data-theme="light"] .card {
+  background: #fff; border: 1px solid var(--border);
+  box-shadow: 0 2px 12px rgba(10,40,95,.04);
+}
+[data-theme="light"] .card-hover:hover {
+  transform: translateY(-6px);
+  border-color: rgba(13,82,199,.35);
+  box-shadow: 0 18px 48px rgba(10,40,95,.12);
+}
+
+/* Product icons — soft blue tint on white */
+[data-theme="light"] .product-icon {
+  background: var(--accent-grad-soft);
+  border: 1px solid rgba(13,82,199,.18);
+  color: var(--accent-2);
+}
+
+/* Chips on white — subtle blue tint */
+[data-theme="light"] .chip {
+  background: rgba(13,82,199,.06);
+  border: 1px solid rgba(13,82,199,.14);
+  color: var(--accent-2);
+}
+
+/* Stat strip — becomes a clean white card with blue numbers on landing */
+[data-theme="light"] .stat-strip {
+  background: #fff; border: 1px solid var(--border);
+  box-shadow: 0 8px 30px rgba(10,40,95,.07);
+}
+[data-theme="light"] .stat .grad-text { background: var(--accent-grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+/* Step numbers — deep blue ring on white */
+[data-theme="light"] .step-num { border-color: var(--accent-2); color: var(--accent-2); background: var(--accent-grad-soft); }
+
+/* Gradient feature cards (earn / bonus) — deep blue gradient on white */
+[data-theme="light"] .card-grad {
+  background: linear-gradient(160deg, #ffffff 0%, #eaf1fb 100%);
+  border: 1px solid rgba(13,82,199,.14);
+}
+
+/* Nav on white — crisp with blue brand */
+[data-theme="light"] .nav { box-shadow: 0 1px 0 rgba(10,40,95,.06); }
+[data-theme="light"] .nav-links a:hover { color: var(--accent-2); }
+[data-theme="light"] .selector { color: var(--text-2); }
+
+/* Footer on white — deep blue heading accents */
+[data-theme="light"] .footer { background: #f4f7fc; }
+[data-theme="light"] .footer h4 { color: var(--accent); }
+[data-theme="light"] .footer a:hover { color: var(--accent-2); }
+
+/* Theme toggle knob uses deep blue */
+[data-theme="light"] .toggle::after { background: var(--accent-grad); }
+
+/* Bonus / earn KPI values — deep blue gradient text on white */
+[data-theme="light"] .kpi .grad-text,
+[data-theme="light"] .kpi .val.grad-text { background: var(--accent-grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+/* Deep-blue top accent line on the whole landing nav */
+.blue-accent-bar { height: 3px; background: var(--accent-grad); width: 100%; }

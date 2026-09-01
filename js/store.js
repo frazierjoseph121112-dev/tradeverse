@@ -271,7 +271,7 @@ function toast(msg, type='info'){
 }
 
 /* theme */
-function getTheme(){ return localStorage.getItem('tv_theme') || 'dark'; }
+function getTheme(){ return localStorage.getItem('tv_theme') || 'light'; }
 function setTheme(t){ localStorage.setItem('tv_theme', t); document.documentElement.setAttribute('data-theme', t); updateThemeToggle(); }
 function toggleTheme(){ setTheme(getTheme()==='dark'?'light':'dark'); }
 function updateThemeToggle(){ document.querySelectorAll('.theme-toggle').forEach(b=>{ b.textContent = getTheme()==='dark'?'☀️':'🌙'; }); }
