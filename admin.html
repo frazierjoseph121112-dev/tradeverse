@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — TradeVerse</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+<!-- ADMIN LOGIN -->
+<div id="adminLogin" class="auth-wrap">
+  <div class="card auth-card card-grad fade-up">
+    <div class="brand mb"><span class="brand-mark">T</span>TradeVerse <span class="chip" style="margin-left:8px">Admin</span></div>
+    <h2 class="h3 mb">Admin login</h2>
+    <form onsubmit="return doAdminLogin(event)">
+      <div class="field"><label>Email</label><input class="input" type="email" id="ad_email" value="admin@tradeverse.io"></div>
+      <div class="field"><label>Password</label><input class="input" type="password" id="ad_pass" value="TradeVerse@2025"></div>
+      <button class="btn btn-primary btn-block btn-lg" type="submit">Enter admin</button>
+    </form>
+    <p class="muted mt" style="font-size:.74rem">Default: admin@tradeverse.io / TradeVerse@2025 — change after first login.</p>
+  </div>
+</div>
+
+<!-- ADMIN SHELL -->
+<div id="adminShell" class="dash" style="display:none">
+  <aside class="dash-side">
+    <div class="side-brand"><span class="brand-mark">T</span>TradeVerse <span style="font-size:.7rem" class="chip">Admin</span></div>
+    <nav class="side-nav">
+      <a href="#" class="active" onclick="adminView('overview',event)">📊 Overview</a>
+      <a href="#" onclick="adminView('users',event)">👥 <span data-i18n="admin_users">Users</span></a>
+      <a href="#" onclick="adminView('deposits',event)">⬇️ <span data-i18n="admin_deposits">Deposits</span></a>
+      <a href="#" onclick="adminView('withdrawals',event)">⬆️ <span data-i18n="admin_withdrawals">Withdrawals</span></a>
+      <a href="#" onclick="adminView('messages',event)">💬 <span data-i18n="admin_messages">Messages</span></a>
+      <a href="#" onclick="adminView('wallets',event)">👛 <span data-i18n="admin_wallets">Wallets</span></a>
+      <a href="#" onclick="adminView('broadcast',event)">📢 <span data-i18n="admin_broadcast">Broadcast</span></a>
+      <a href="#" onclick="adminView('activity',event)">📜 <span data-i18n="admin_activity">Activity</span></a>
+      <a href="#" onclick="adminView('ai',event)">🤖 <span data-i18n="admin_ai">AI Monitor</span></a>
+      <a href="#" onclick="adminLogout()">🚪 Log out</a>
+    </nav>
+  </aside>
+  <main class="dash-main">
+    <div class="dash-topbar">
+      <h2 class="h3">Admin Dashboard</h2>
+      <div style="margin-left:auto" class="flex gap">
+        <span id="langSlot"></span>
+        <button class="selector theme-toggle" onclick="toggleTheme()">🌙</button>
+        <a href="index.html" class="btn btn-ghost btn-sm">← Site</a>
+      </div>
+    </div>
+
+    <div id="av-overview" class="view">
+      <div class="kpi-grid">
+        <div class="card kpi admin-kpi"><div class="lbl">Total users</div><div class="val grad-text" id="aUsers">0</div></div>
+        <div class="card kpi admin-kpi"><div class="lbl">Pending deposits</div><div class="val accent" id="aDep">0</div></div>
+        <div class="card kpi admin-kpi"><div class="lbl">Pending withdrawals</div><div class="val accent" id="aWd">0</div></div>
+        <div class="card kpi admin-kpi"><div class="lbl">Unread support</div><div class="val accent" id="aMsg">0</div></div>
+      </div>
+      <div class="dash-grid-2 mt">
+        <div class="card"><h3 class="mb">Recent users</h3><div id="recentUsers"></div></div>
+        <div class="card"><h3 class="mb">Recent activity</h3><div id="recentAct"></div></div>
+      </div>
+    </div>
+
+    <div id="av-users" class="view hidden">
+      <div class="card">
+        <div class="between mb"><h3 data-i18n="admin_users">Users</h3><input class="input" id="userSearch" data-i18n-ph="search_ph" placeholder="Search…" oninput="renderUsers()" style="max-width:240px"></div>
+        <div class="scroll-x"><table class="tbl"><thead><tr><th>Name</th><th>Email</th><th>Country</th><th>Balance</th><th>Bonus</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="usersBody"></tbody></table></div>
+      </div>
+    </div>
+
+    <div id="av-deposits" class="view hidden">
+      <div class="card"><h3 class="mb" data-i18n="admin_deposits">Deposits</h3>
+        <div class="scroll-x"><table class="tbl"><thead><tr><th>User</th><th>Method</th><th>Amount</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="depBody"></tbody></table></div>
+        <p class="muted mt" style="font-size:.78rem">⚠️ Only approve after you verify the transaction on-chain. This keeps deposits real and verifiable.</p>
+      </div>
+    </div>
+
+    <div id="av-withdrawals" class="view hidden">
+      <div class="card"><h3 class="mb" data-i18n="admin_withdrawals">Withdrawals</h3>
+        <div class="scroll-x"><table class="tbl"><thead><tr><th>User</th><th>Amount</th><th>Address</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="wdBody"></tbody></table></div>
+      </div>
+    </div>
+
+    <div id="av-messages" class="view hidden">
+      <div class="dash-grid-2">
+        <div class="card"><h3 class="mb">Support inbox</h3><div id="supportList"></div></div>
+        <div class="card"><h3 class="mb">Conversation</h3><div id="convBody" style="max-height:340px;overflow-y:auto;margin-bottom:14px"></div>
+          <div class="chat-input" style="border:1px solid var(--border);border-radius:12px"><input class="input" id="adminReply" placeholder="Reply to user…" onkeydown="if(event.key==='Enter')adminSend()"><button class="btn btn-primary btn-sm" onclick="adminSend()" data-i18n="reply">Reply</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="av-wallets" class="view hidden">
+      <div class="card"><h3 class="mb" data-i18n="admin_wallets">Wallets</h3>
+        <div id="walletsAdmin"></div>
+        <p class="muted mt" style="font-size:.78rem">Edit deposit wallet addresses here. Users will see the updated addresses on their deposit page.</p>
+      </div>
+    </div>
+
+    <div id="av-broadcast" class="view hidden">
+      <div class="card" style="max-width:560px">
+        <h3 class="mb" data-i18n="admin_broadcast">Broadcast</h3>
+        <p class="text-2 mb" style="font-size:.88rem">Send a message to all users — appears in their notifications (and triggers email intent).</p>
+        <div class="field"><label>Subject</label><input class="input" id="bcSub" placeholder="e.g. New trading hours"></div>
+        <div class="field"><label>Message</label><textarea class="input" id="bcBody" rows="4" placeholder="Your message…"></textarea></div>
+        <button class="btn btn-primary" onclick="doBroadcast()" data-i18n="send">Send</button>
+        <div class="divider"></div>
+        <h4 class="mb">Past broadcasts</h4><div id="bcList"></div>
+      </div>
+    </div>
+
+    <div id="av-activity" class="view hidden">
+      <div class="card"><h3 class="mb" data-i18n="admin_activity">Activity</h3><div id="actList"></div></div>
+    </div>
+
+    <div id="av-ai" class="view hidden">
+      <div class="dash-grid-2">
+        <div class="card">
+          <h3 class="mb" data-i18n="admin_ai">AI Monitor</h3>
+          <div class="kpi-grid" style="grid-template-columns:1fr 1fr">
+            <div class="kpi"><div class="lbl">Dashboard sync</div><div class="val badge-up">● Live</div></div>
+            <div class="kpi"><div class="lbl">Market feed</div><div class="val badge-up">● Live</div></div>
+            <div class="kpi"><div class="lbl">Escalations</div><div class="val accent" id="aiEsc">0</div></div>
+            <div class="kpi"><div class="lbl">Users monitored</div><div class="val" id="aiMon">0</div></div>
+          </div>
+          <p class="text-2 mt" style="font-size:.88rem">The AI keeps every user dashboard in sync with live crypto/stock/forex data, answers support questions instantly, and notifies you (admin) by email + activity log when a user needs human help or an anomaly is flagged.</p>
+        </div>
+        <div class="card"><h3 class="mb">AI event log</h3><div id="aiLog"></div></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="js/i18n.js"></script>
+<script src="js/store.js"></script>
+<script src="js/market.js"></script>
+<script src="js/components.js"></script>
+<script>
+let currentConvUser = null;
+
+function doAdminLogin(e){
+  e.preventDefault();
+  const r = TV.adminLogin(document.getElementById('ad_email').value, document.getElementById('ad_pass').value);
+  if(!r.ok){ toast(r.error,'error'); return false; }
+  enterAdmin();
+  return false;
+}
+function enterAdmin(){
+  document.getElementById('adminLogin').style.display='none';
+  document.getElementById('adminShell').style.display='grid';
+  document.getElementById('langSlot').outerHTML = buildLangSelector();
+  applyI18n(); updateKPIs();
+  renderOverview();
+}
+function adminLogout(){ TV.setAdmin(false); location.reload(); }
+function adminView(v,e){ if(e)e.preventDefault();
+  document.querySelectorAll('#adminShell .view').forEach(x=>x.classList.add('hidden'));
+  document.getElementById('av-'+v).classList.remove('hidden');
+  document.querySelectorAll('#adminShell .side-nav a').forEach(a=>a.classList.remove('active'));
+  e.currentTarget.classList.add('active');
+  if(v==='overview')renderOverview();
+  if(v==='users')renderUsers();
+  if(v==='deposits')renderDeposits();
+  if(v==='withdrawals')renderWithdrawals();
+  if(v==='messages')renderSupport();
+  if(v==='wallets')renderWalletsAdmin();
+  if(v==='broadcast')renderBroadcasts();
+  if(v==='activity')renderActivity();
+  if(v==='ai')renderAI();
+}
+function updateKPIs(){
+  const d=TV.load();
+  document.getElementById('aUsers').textContent=d.users.length;
+  document.getElementById('aDep').textContent=d.deposits.filter(x=>x.status==='pending').length;
+  document.getElementById('aWd').textContent=d.withdrawals.filter(x=>x.status==='pending').length;
+  const unread = Object.entries(d.support).filter(([uid,msgs])=>msgs.some(m=>m.from==='user')).length;
+  document.getElementById('aMsg').textContent=unread;
+}
+function renderOverview(){
+  const d=TV.load();
+  document.getElementById('recentUsers').innerHTML = d.users.slice(-5).reverse().map(u=>`<div class="watch-item"><span class="sym"><span class="coin">${u.name.slice(0,2).toUpperCase()}</span>${u.name}</span><span class="muted">${u.email}</span></div>`).join('') || '<p class="muted center" style="padding:18px">No users yet.</p>';
+  document.getElementById('recentAct').innerHTML = d.activity.slice(-8).reverse().map(a=>`<div class="watch-item"><span class="text-2" style="font-size:.85rem">${a.text}</span><span class="muted" style="font-size:.75rem">${new Date(a.ts).toLocaleTimeString()}</span></div>`).join('') || '<p class="muted center" style="padding:18px">No activity yet.</p>';
+  updateKPIs();
+}
+function renderUsers(){
+  const d=TV.load(); const q=(document.getElementById('userSearch')?.value||'').toLowerCase();
+  const list = d.users.filter(u=>!q||u.name.toLowerCase().includes(q)||u.email.includes(q));
+  document.getElementById('usersBody').innerHTML = list.map(u=>`<tr>
+    <td class="sym"><span class="coin">${u.name.slice(0,2).toUpperCase()}</span>${u.name}</td>
+    <td>${u.email}</td><td>${u.country}</td><td>$${u.balance.toFixed(2)}</td><td class="accent">$${u.bonus}</td>
+    <td>${new Date(u.joined).toLocaleDateString()}</td>
+    <td><button class="btn btn-ghost btn-sm" onclick="openConv('${u.id}')">Message</button></td></tr>`).join('') || '<tr><td colspan="7" class="muted center" style="padding:18px">No users.</td></tr>';
+}
+function renderDeposits(){
+  const d=TV.load();
+  document.getElementById('depBody').innerHTML = d.deposits.slice().reverse().map(x=>{ const u=TV.getUser(x.userId); return `<tr>
+    <td>${u?u.email:x.userId}</td><td>${x.method}</td><td>$${x.amount}</td>
+    <td><span class="tag ${x.status==='completed'?'tag-ok':x.status==='pending'?'tag-pend':'tag-no'}">${x.status}</span></td>
+    <td>${new Date(x.ts).toLocaleString()}</td>
+    <td>${x.status==='pending'?`<button class="btn btn-primary btn-sm" onclick="approveDep('${x.id}')">${t('approve')}</button> <button class="btn btn-ghost btn-sm" onclick="rejectDep('${x.id}')">${t('reject')}</button>`:'—'}</td></tr>`; }).join('') || '<tr><td colspan="6" class="muted center" style="padding:18px">No deposits.</td></tr>';
+}
+function renderWithdrawals(){
+  const d=TV.load();
+  document.getElementById('wdBody').innerHTML = d.withdrawals.slice().reverse().map(x=>{ const u=TV.getUser(x.userId); return `<tr>
+    <td>${u?u.email:x.userId}</td><td>$${x.amount}</td><td style="font-family:monospace;font-size:.78rem">${(x.addr||'').slice(0,18)}…</td>
+    <td><span class="tag ${x.status==='completed'?'tag-ok':x.status==='pending'?'tag-pend':'tag-no'}">${x.status}</span></td>
+    <td>${new Date(x.ts).toLocaleString()}</td>
+    <td>${x.status==='pending'?`<button class="btn btn-primary btn-sm" onclick="approveWd('${x.id}')">${t('approve')}</button> <button class="btn btn-ghost btn-sm" onclick="rejectWd('${x.id}')">${t('reject')}</button>`:'—'}</td></tr>`; }).join('') || '<tr><td colspan="6" class="muted center" style="padding:18px">No withdrawals.</td></tr>';
+}
+function approveDep(id){ TV.approveDeposit(id); const dep=TV.load().deposits.find(x=>x.id===id); if(dep)notifyEmail(dep.userId,'Deposit confirmed',`Your deposit of $${dep.amount} was credited.`); toast('Deposit approved','success'); renderDeposits(); renderOverview(); }
+function rejectDep(id){ TV.rejectDeposit(id); toast('Deposit rejected','warn'); renderDeposits(); }
+function approveWd(id){ TV.approveWithdrawal(id); const wd=TV.load().withdrawals.find(x=>x.id===id); if(wd)notifyEmail(wd.userId,'Withdrawal processed',`Your withdrawal of $${wd.amount} was sent.`); toast('Withdrawal approved','success'); renderWithdrawals(); renderOverview(); }
+function rejectWd(id){ TV.rejectWithdrawal(id); toast('Withdrawal rejected','warn'); renderWithdrawals(); }
+
+function renderSupport(){
+  const d=TV.load();
+  const threads = Object.entries(d.support).filter(([uid,msgs])=>msgs.length);
+  document.getElementById('supportList').innerHTML = threads.map(([uid,msgs])=>{ const u=TV.getUser(uid); const last=msgs[msgs.length-1]; return `<div class="watch-item" style="cursor:pointer" onclick="openConv('${uid}')"><span class="sym"><span class="coin">${(u?u.name:'?').slice(0,2).toUpperCase()}</span>${u?u.name:uid}</span><span class="muted" style="font-size:.78rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${last.text}</span></div>`; }).join('') || '<p class="muted center" style="padding:18px">No support messages yet.</p>';
+}
+function openConv(uid){
+  currentConvUser = uid;
+  adminView('messages',{preventDefault:()=>{},currentTarget:{classList:{add:()=>{}}}});
+  renderConv();
+}
+function renderConv(){
+  const d=TV.load(); const msgs = d.support[currentConvUser]||[]; const u=TV.getUser(currentConvUser);
+  document.getElementById('convBody').innerHTML = `<div class="muted mb" style="font-size:.8rem">${u?u.name+' · '+u.email:currentConvUser}</div>` + msgs.map(m=>`<div class="chat-msg ${m.from==='user'?'bot':'me'}" style="margin-bottom:8px">${m.text}</div>`).join('') || '<p class="muted">No messages.</p>';
+}
+function adminSend(){
+  const txt = document.getElementById('adminReply').value.trim();
+  if(!txt||!currentConvUser) return;
+  TV.sendSupport(currentConvUser, txt, 'admin');
+  notifyEmail(currentConvUser,'Support reply',txt);
+  document.getElementById('adminReply').value='';
+  renderConv(); renderSupport();
+  toast('Reply sent','success');
+}
+
+function renderWalletsAdmin(){
+  const d=TV.load();
+  document.getElementById('walletsAdmin').innerHTML = d.wallets.map(w=>`<div class="card" style="margin-bottom:14px">
+    <div class="between mb"><strong>${w.name}</strong><span class="chip">${w.network}</span></div>
+    <input class="input" id="w_${w.id}" value="${w.address}" style="font-family:monospace;font-size:.82rem">
+    <button class="btn btn-primary btn-sm mt" onclick="saveWallet('${w.id}')">${t('save')}</button>
+  </div>`).join('');
+}
+function saveWallet(id){ const addr=document.getElementById('w_'+id).value.trim(); TV.updateWallet(id,addr); toast('Wallet updated','success'); }
+
+function doBroadcast(){
+  const sub=document.getElementById('bcSub').value.trim(); const body=document.getElementById('bcBody').value.trim();
+  if(!sub||!body){ toast('Fill subject and message','error'); return; }
+  const d=TV.load(); d.users.forEach(u=>notifyEmail(u.id,sub,body));
+  TV.broadcast(sub,body);
+  toast('Broadcast sent to all users','success');
+  document.getElementById('bcSub').value=''; document.getElementById('bcBody').value='';
+  renderBroadcasts(); renderOverview();
+}
+function renderBroadcasts(){ const d=TV.load(); document.getElementById('bcList').innerHTML=d.broadcasts.slice().reverse().map(b=>`<div class="watch-item"><div><strong>${b.subject}</strong><div class="muted" style="font-size:.78rem">${b.body}</div></div><span class="muted" style="font-size:.72rem">${new Date(b.ts).toLocaleString()}</span></div>`).join('')||'<p class="muted">None yet.</p>'; }
+function renderActivity(){ const d=TV.load(); document.getElementById('actList').innerHTML=d.activity.slice().reverse().map(a=>`<div class="watch-item"><span class="text-2" style="font-size:.85rem"><span class="tag tag-info">${a.type}</span> ${a.text}</span><span class="muted" style="font-size:.75rem">${new Date(a.ts).toLocaleString()}</span></div>`).join('')||'<p class="muted center" style="padding:18px">No activity.</p>'; }
+function renderAI(){
+  const d=TV.load();
+  document.getElementById('aiEsc').textContent=d.aiLogs.filter(l=>l.text.includes('escalation')).length;
+  document.getElementById('aiMon').textContent=d.users.length;
+  document.getElementById('aiLog').innerHTML=d.aiLogs.slice().reverse().map(l=>`<div class="watch-item"><span class="text-2" style="font-size:.85rem">🤖 ${l.text}</span><span class="muted" style="font-size:.75rem">${new Date(l.ts).toLocaleTimeString()}</span></div>`).join('')||'<p class="muted center" style="padding:18px">No AI events yet. Events appear when users request human help.</p>';
+}
+
+initTheme(); updateThemeToggle(); applyI18n();
+if(TV.adminSession()) enterAdmin();
+setInterval(()=>{ if(TV.adminSession()) updateKPIs(); }, 4000);
+</script>
+</body>
+</html>

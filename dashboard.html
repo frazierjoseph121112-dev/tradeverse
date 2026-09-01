@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — TradeVerse</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+<button class="dash-mobile-toggle" onclick="toggleSidebar()">☰ <span data-i18n="dash_portfolio">Menu</span></button>
+<div class="dash">
+  <!-- SIDEBAR -->
+  <aside class="dash-side" id="dashSide">
+    <div class="side-brand"><span class="brand-mark">T</span>TradeVerse</div>
+    <nav class="side-nav">
+      <a href="#" class="active" onclick="showView('overview',event)">📊 <span data-i18n="dash_portfolio">Portfolio</span></a>
+      <a href="#" onclick="showView('markets',event)">📈 <span data-i18n="dash_watch">Market watch</span></a>
+      <a href="#" onclick="showView('holdings',event)">💼 <span data-i18n="dash_holdings">Holdings</span></a>
+      <a href="#" onclick="showView('history',event)">🧾 <span data-i18n="dash_history">Transaction history</span></a>
+      <a href="#" onclick="showView('deposit',event)">⬇️ <span data-i18n="dash_deposit">Deposit</span></a>
+      <a href="#" onclick="showView('withdraw',event)">⬆️ <span data-i18n="dash_withdraw">Withdraw</span></a>
+      <a href="#" onclick="showView('notif',event)">🔔 <span data-i18n="dash_notif">Notifications</span></a>
+      <a href="#" onclick="showView('settings',event)">⚙️ <span data-i18n="dash_settings">Settings</span></a>
+      <a href="#" onclick="showView('referral',event)">🤝 <span data-i18n="ref_dash">Referral program</span></a>
+      <a href="#" onclick="logout()">🚪 <span data-i18n="logout">Log out</span></a>
+    </nav>
+    <div class="divider"></div>
+    <div class="chip" style="justify-content:center">🤖 <span data-i18n="dash_support">Support</span> · AI online</div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="dash-main">
+    <div class="dash-topbar">
+      <h2 class="h3" id="greet">Welcome back</h2>
+      <div style="margin-left:auto" class="flex gap" id="topbarRight">
+        <span id="langSlot"></span>
+        <button class="selector theme-toggle" onclick="toggleTheme()">🌙</button>
+        <a href="index.html" class="btn btn-ghost btn-sm">← Site</a>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="card kpi"><div class="lbl" data-i18n="dash_balance">Available balance</div><div class="val grad-text" id="kpiBalance">$0</div><div class="chg badge-up">USD</div></div>
+      <div class="card kpi"><div class="lbl" data-i18n="dash_bonus">Promotional credit</div><div class="val accent" id="kpiBonus">$0</div><div class="chg">Welcome bonus</div></div>
+      <div class="card kpi"><div class="lbl">Portfolio value</div><div class="val" id="kpiPort">$0</div><div class="chg badge-up" id="kpiPnl">+0.00%</div></div>
+      <div class="card kpi"><div class="lbl" data-i18n="dash_notif">Notifications</div><div class="val" id="kpiNotif">0</div><div class="chg">Unread</div></div>
+    </div>
+
+    <!-- VIEWS -->
+    <div id="view-overview" class="view">
+      <div class="dash-grid-2 mt">
+        <div class="card">
+          <div class="between mb"><h3 data-i18n="dash_portfolio">Portfolio</h3><span class="pill-tabs"><button class="active" onclick="setRange(30,event)">30D</button><button onclick="setRange(90,event)">90D</button><button onclick="setRange(180,event)">180D</button></span></div>
+          <canvas id="portChart" height="120"></canvas>
+        </div>
+        <div class="card">
+          <h3 class="mb">My Pies</h3>
+          <div id="piesList"></div>
+        </div>
+      </div>
+      <div class="card mt">
+        <div class="between mb"><h3 data-i18n="dash_watch">Market watch</h3><span class="chip"><span class="dot dot-up"></span> Live</span></div>
+        <div class="pill-tabs mb" id="watchTabs">
+          <button class="active" onclick="setWatch('crypto',event)">Crypto</button>
+          <button onclick="setWatch('forex',event)">Forex</button>
+          <button onclick="setWatch('stocks',event)">Stocks</button>
+          <button onclick="setWatch('metals',event)">Metals</button>
+        </div>
+        <div data-watch="crypto"></div>
+      </div>
+    </div>
+
+    <div id="view-markets" class="view hidden">
+      <div class="card"><h3 class="mb">Crypto</h3><div data-watch="crypto"></div></div>
+      <div class="dash-grid-2 mt">
+        <div class="card"><h3 class="mb">Forex</h3><div data-watch="forex"></div></div>
+        <div class="card"><h3 class="mb">Stocks</h3><div data-watch="stocks"></div></div>
+      </div>
+      <div class="dash-grid-2 mt">
+        <div class="card"><h3 class="mb">Metals</h3><div data-watch="metals"></div></div>
+        <div class="card"><h3 class="mb">Indices</h3><div data-watch="indices"></div></div>
+      </div>
+    </div>
+
+    <div id="view-holdings" class="view hidden">
+      <div class="card">
+        <h3 class="mb" data-i18n="dash_holdings">Holdings</h3>
+        <div class="scroll-x"><table class="tbl" id="holdTbl"><thead><tr><th>Asset</th><th>Qty</th><th>Avg price</th><th>Current</th><th>P/L</th></tr></thead><tbody id="holdBody"></tbody></table></div>
+      </div>
+    </div>
+
+    <div id="view-history" class="view hidden">
+      <div class="card">
+        <h3 class="mb" data-i18n="dash_history">Transaction history</h3>
+        <div class="scroll-x"><table class="tbl"><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead><tbody id="histBody"></tbody></table></div>
+      </div>
+    </div>
+
+    <div id="view-deposit" class="view hidden">
+      <div class="card" style="max-width:560px">
+        <h3 class="mb" data-i18n="dep_title">Deposit funds</h3>
+        <div class="field"><label data-i18n="dep_method">Payment method</label>
+          <select class="input" id="depMethod" onchange="renderWallet()"></select>
+        </div>
+        <div class="field"><label data-i18n="dep_amount">Amount (USD)</label><input class="input" type="number" id="depAmount" value="100" min="20"></div>
+        <div class="wallet-card" id="walletBox"></div>
+        <p class="muted mt" style="font-size:.8rem" data-i18n="dep_note">Your deposit will be credited after blockchain confirmation.</p>
+        <button class="btn btn-primary btn-block mt" onclick="submitDeposit()" data-i18n="dep_title">Deposit funds</button>
+        <p class="muted mt" style="font-size:.74rem">⚠️ Always verify the network matches the coin. Sending on the wrong network may result in permanent loss.</p>
+      </div>
+    </div>
+
+    <div id="view-withdraw" class="view hidden">
+      <div class="card" style="max-width:560px">
+        <h3 class="mb" data-i18n="wd_title">Withdraw funds</h3>
+        <div class="field"><label data-i18n="dep_amount">Amount (USD)</label><input class="input" type="number" id="wdAmount" min="10"></div>
+        <div class="field"><label data-i18n="wd_addr">Withdrawal address</label><input class="input" id="wdAddr" placeholder="Your wallet address"></div>
+        <div class="field"><label>Network</label>
+          <select class="input" id="wdNet"><option>Bitcoin</option><option>ERC-20</option><option>TRC-20</option><option>Litecoin</option></select>
+        </div>
+        <button class="btn btn-primary btn-block" onclick="submitWithdraw()" data-i18n="wd_btn">Request withdrawal</button>
+        <p class="muted mt" style="font-size:.74rem">Withdrawals are reviewed and processed by our team. Funds are held until approved.</p>
+      </div>
+    </div>
+
+    <div id="view-notif" class="view hidden">
+      <div class="card">
+        <div class="between mb"><h3 data-i18n="dash_notif">Notifications</h3><button class="btn btn-ghost btn-sm" onclick="TV.markNotifRead(USER.id);renderNotif();updateKPIs()">Mark all read</button></div>
+        <div id="notifList"></div>
+      </div>
+    </div>
+
+    <div id="view-settings" class="view hidden">
+      <div class="card" style="max-width:520px">
+        <h3 class="mb">Account</h3>
+        <div class="flex between" style="padding:10px 0"><span class="text-2">Name</span><strong id="setName"></strong></div>
+        <div class="flex between" style="padding:10px 0"><span class="text-2">Email</span><strong id="setEmail"></strong></div>
+        <div class="flex between" style="padding:10px 0"><span class="text-2">Country</span><strong id="setCountry"></strong></div>
+        <div class="flex between" style="padding:10px 0"><span class="text-2">Member since</span><strong id="setSince"></strong></div>
+        <div class="divider"></div>
+        <h3 class="mb" data-i18n="change_pass">Change password</h3>
+        <form onsubmit="return doChangePass(event)">
+          <div class="field"><label data-i18n="curr_pass">Current password</label><input class="input" type="password" id="cp_curr" required></div>
+          <div class="field"><label data-i18n="new_pass">New password</label><input class="input" type="password" id="cp_new" required></div>
+          <button class="btn btn-primary" type="submit" data-i18n="save">Save changes</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- REFERRAL PROGRAM VIEW -->
+    <div id="view-referral" class="view hidden">
+      <div class="referral-panel pink-card" style="margin-bottom:20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+          <div>
+            <span class="pink-chip mb" style="margin-bottom:10px">🤝 <span data-i18n="ref_bonus">Referral bonus</span></span>
+            <h3 class="pink-grad-text" style="font-size:1.6rem;font-weight:800" data-i18n="ref_title">Refer friends, earn $50</h3>
+            <p class="text-2" style="max-width:480px;margin-top:6px" data-i18n="ref_sub">Invite friends to TradeVerse and you both get rewarded. You earn $50 for every friend who signs up and makes their first deposit.</p>
+          </div>
+          <div style="text-align:center">
+            <div class="referral-stat-item"><div class="num">$50</div><div class="lbl" data-i18n="ref_per_referral">per referral</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="referral-panel" style="margin-bottom:20px">
+        <h4 class="mb" data-i18n="ref_code">Your referral code</h4>
+        <div class="referral-code-box">
+          <span id="refCode">—</span>
+          <button class="copy-btn" onclick="copyRefCode()" data-i18n="ref_copy">Copy</button>
+        </div>
+        <h4 class="mb" style="margin-top:18px" data-i18n="ref_link">Your referral link</h4>
+        <div class="referral-link-box">
+          <code id="refLink">—</code>
+          <button class="copy-btn" onclick="copyRefLink()" data-i18n="ref_share">Share referral link</button>
+        </div>
+      </div>
+
+      <div class="referral-panel">
+        <div class="referral-stats" style="display:flex;gap:32px;justify-content:center;margin-bottom:20px">
+          <div class="referral-stat-item"><div class="num" id="refInvited">0</div><div class="lbl" data-i18n="ref_invited">Friends invited</div></div>
+          <div class="referral-stat-item"><div class="num" id="refEarned">$0</div><div class="lbl" data-i18n="ref_earned">Total earned</div></div>
+          <div class="referral-stat-item"><div class="num" id="refPending">0</div><div class="lbl" data-i18n="ref_pending">Pending</div></div>
+        </div>
+        <table class="referral-table" id="refTable">
+          <thead><tr>
+            <th data-i18n="ref_table_friend">Friend</th>
+            <th data-i18n="ref_table_date">Date</th>
+            <th data-i18n="ref_table_status">Status</th>
+            <th data-i18n="ref_table_bonus">Bonus</th>
+          </tr></thead>
+          <tbody id="refTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+<div id="chat"></div>
+<script src="js/i18n.js"></script>
+<script src="js/store.js"></script>
+<script src="js/market.js"></script>
+<script src="js/components.js"></script>
+<script>
+if(!TV.session()) location.href='login.html';
+let USER = TV.getUser(TV.session().id);
+let portChart, range=30;
+
+function renderTopbar(){
+  document.getElementById('langSlot').outerHTML = buildLangSelector();
+}
+function greet(){
+  document.getElementById('greet').textContent = `Welcome back, ${USER.name.split(' ')[0]} 👋`;
+  document.getElementById('setName').textContent = USER.name;
+  document.getElementById('setEmail').textContent = USER.email;
+  document.getElementById('setCountry').textContent = USER.country;
+  document.getElementById('setSince').textContent = new Date(USER.joined).toLocaleDateString();
+}
+function fmtM(n){ return '$'+Number(n).toLocaleString('en-US',{maximumFractionDigits:2}); }
+function updateKPIs(){
+  USER = TV.getUser(USER.id);
+  document.getElementById('kpiBalance').textContent = fmtM(USER.balance);
+  document.getElementById('kpiBonus').textContent = fmtM(USER.bonus);
+  const portVal = USER.balance + USER.bonus + USER.holdings.reduce((s,h)=>s+h.qty*h.avgPrice*1.02,0);
+  document.getElementById('kpiPort').textContent = fmtM(portVal);
+  const unread = USER.notifications.filter(n=>!n.read).length;
+  document.getElementById('kpiNotif').textContent = unread;
+  const pnl = USER.holdings.length? (Math.random()*6-1).toFixed(2):0;
+  const el=document.getElementById('kpiPnl');
+  el.textContent = (pnl>=0?'+':'')+pnl+'%'; el.className='chg '+(pnl>=0?'badge-up':'badge-down');
+}
+function renderPies(){
+  document.getElementById('piesList').innerHTML = USER.pies.map(p=>`
+    <div class="watch-item"><div><strong>${p.name}</strong><div class="muted" style="font-size:.8rem">${p.items.join(' · ')}</div></div><strong class="accent">${fmtM(p.value)}</strong></div>`).join('');
+}
+function renderHoldings(){
+  const body = document.getElementById('holdBody');
+  if(!USER.holdings.length){ body.innerHTML='<tr><td colspan="5" class="muted center" style="padding:24px">No holdings yet. Make a deposit to start trading.</td></tr>'; return; }
+  body.innerHTML = USER.holdings.map(h=>{
+    const cur = (Market.stocks.find(s=>s.sym===h.symbol)||Market.crypto.find(c=>c.sym===h.symbol)||{}).price || h.avgPrice;
+    const pl = (cur-h.avgPrice)*h.qty;
+    return `<tr><td class="sym"><span class="coin">${h.symbol.slice(0,2)}</span>${h.symbol}</td><td>${h.qty}</td><td>${h.avgPrice}</td><td>${Market.fmt(cur)}</td><td class="${pl>=0?'badge-up':'badge-down'}">${pl>=0?'+':''}${pl.toFixed(2)}</td></tr>`;
+  }).join('');
+}
+function renderHistory(){
+  document.getElementById('histBody').innerHTML = USER.transactions.slice().reverse().map(tx=>`
+    <tr><td>${new Date(tx.ts).toLocaleString()}</td><td><span class="tag tag-info">${tx.type}</span></td><td>${tx.desc}</td><td class="${tx.amount>=0?'badge-up':'badge-down'}">${tx.amount>=0?'+':''}${fmtM(tx.amount)}</td><td><span class="tag ${tx.status==='completed'?'tag-ok':tx.status==='pending'?'tag-pend':'tag-no'}">${tx.status}</span></td></tr>`).join('') || '<tr><td colspan="5" class="muted center" style="padding:24px">No transactions yet.</td></tr>';
+}
+function renderNotif(){
+  document.getElementById('notifList').innerHTML = USER.notifications.slice().reverse().map(n=>`
+    <div class="notif-item"><div class="notif-ic">${n.broadcast?'📢':'🔔'}</div><div><div style="font-size:.9rem">${n.text}</div><div class="muted" style="font-size:.76rem">${new Date(n.ts).toLocaleString()}</div></div>${!n.read?'<span class="dot dot-up" style="align-self:center"></span>':''}</div>`).join('') || '<p class="muted center" style="padding:24px">No notifications.</p>';
+}
+function renderWallet(){
+  const d = TV.load();
+  const sel = document.getElementById('depMethod').value;
+  const w = d.wallets.find(x=>x.id===sel) || d.wallets[0];
+  document.getElementById('walletBox').innerHTML = `
+    <div class="between mb"><strong>${w.name}</strong><span class="chip">${w.network}</span></div>
+    <div class="qr-box"><img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${w.address}" alt="QR" style="border-radius:8px"></div>
+    <div class="wallet-addr" onclick="copyAddr(this,'${w.address}')">${w.address}</div>
+    <p class="muted mt" style="font-size:.8rem">Tap the address to copy. Send only ${w.name.split('(')[0].trim()} to this address.</p>`;
+}
+function copyAddr(el,addr){ navigator.clipboard?.writeText(addr); toast('Address copied','success'); }
+function submitDeposit(){
+  const method = document.getElementById('depMethod').value;
+  const amount = parseFloat(document.getElementById('depAmount').value);
+  const w = TV.load().wallets.find(x=>x.id===method);
+  if(!amount||amount<20){ toast('Minimum deposit is $20','error'); return; }
+  TV.requestDeposit(USER.id, w?w.name:method, amount, w?w.address:'');
+  notifyEmail(USER.id,'Deposit received',`Your deposit request of $${amount} via ${w?w.name:method} is being processed.`);
+  toast('Deposit request submitted! Awaiting confirmation.','success');
+  USER = TV.getUser(USER.id); updateKPIs(); renderHistory(); renderNotif();
+}
+function submitWithdraw(){
+  const amount = parseFloat(document.getElementById('wdAmount').value);
+  const addr = document.getElementById('wdAddr').value.trim();
+  if(!amount||amount<10){ toast('Minimum withdrawal is $10','error'); return; }
+  if(!addr){ toast('Enter a withdrawal address','error'); return; }
+  const r = TV.requestWithdrawal(USER.id, amount, addr);
+  if(!r.ok){ toast(r.error,'error'); return; }
+  notifyEmail(USER.id,'Withdrawal requested',`Your withdrawal of $${amount} is being processed.`);
+  toast('Withdrawal request submitted','success');
+  USER = TV.getUser(USER.id); updateKPIs(); renderHistory(); renderNotif();
+}
+function doChangePass(e){
+  e.preventDefault();
+  const r = TV.changePassword(USER.id, document.getElementById('cp_curr').value, document.getElementById('cp_new').value);
+  if(!r.ok){ toast(r.error,'error'); return false; }
+  toast('Password updated','success'); e.target.reset();
+  return false;
+}
+function logout(){ TV.clearSession(); location.href='index.html'; }
+
+/* ---------- Referral program ---------- */
+function renderReferral(){
+  // Ensure the user has a referral code (backfill for older accounts)
+  const code = TV.ensureReferralCode(USER.id);
+  const link = TV.getReferralLink(USER.id);
+  const stats = TV.getReferralStats(USER.id);
+  const t = I18N[getLang()] || I18N.en;
+  document.getElementById('refCode').textContent = code;
+  document.getElementById('refLink').textContent = link;
+  document.getElementById('refInvited').textContent = stats.invited;
+  document.getElementById('refEarned').textContent = '$' + stats.earned;
+  document.getElementById('refPending').textContent = stats.pending;
+  const tbody = document.getElementById('refTableBody');
+  if(!stats.referrals.length){
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text-dim)">${t.ref_no_refs}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = stats.referrals.map(r=>{
+    const date = new Date(r.ts).toLocaleDateString();
+    const badge = r.status==='completed'
+      ? `<span class="referral-badge-completed">${t.ref_status_completed}</span>`
+      : `<span class="referral-badge-pending">${t.ref_status_pending}</span>`;
+    const bonus = r.status==='completed' ? `+$${r.bonus}` : '—';
+    return `<tr><td>${r.name}<br><span style="font-size:.78rem;color:var(--text-dim)">${r.email}</span></td><td>${date}</td><td>${badge}</td><td style="font-weight:700;color:var(--pink)">${bonus}</td></tr>`;
+  }).join('');
+}
+function copyRefCode(){
+  const code = document.getElementById('refCode').textContent;
+  navigator.clipboard.writeText(code).then(()=>toast((I18N[getLang()]||I18N.en).ref_copied||'Copied!','success'));
+}
+function copyRefLink(){
+  const link = document.getElementById('refLink').textContent;
+  navigator.clipboard.writeText(link).then(()=>toast((I18N[getLang()]||I18N.en).ref_copied||'Copied!','success'));
+}
+
+function toggleSidebar(){ document.getElementById('dashSide').classList.toggle('open'); }
+function showView(v,e){ if(e)e.preventDefault();
+  document.querySelectorAll('.view').forEach(x=>x.classList.add('hidden'));
+  document.getElementById('view-'+v).classList.remove('hidden');
+  document.querySelectorAll('.side-nav a').forEach(a=>a.classList.remove('active'));
+  if(e)e.currentTarget.classList.add('active');
+  var ds=document.getElementById('dashSide'); if(ds) ds.classList.remove('open');
+  if(v==='history')renderHistory();
+  if(v==='holdings')renderHoldings();
+  if(v==='notif')renderNotif();
+  if(v==='referral')renderReferral();
+  if(v==='deposit'){ const sel=document.getElementById('depMethod'); const d=TV.load(); sel.innerHTML=d.wallets.map(w=>`<option value="${w.id}">${w.name} (${w.network})</option>`).join(''); renderWallet(); }
+}
+function setWatch(cat,e){ if(e)e.preventDefault(); document.querySelectorAll('#watchTabs button').forEach(b=>b.classList.remove('active')); e.currentTarget.classList.add('active'); const el=document.querySelector('#view-overview [data-watch]'); el.setAttribute('data-watch',cat); Market.refreshTickers(); }
+function setRange(r,e){ if(e)e.preventDefault(); range=r; document.querySelectorAll('.pill-tabs .active')?.forEach?.(()=>{}); drawChart(); }
+function drawChart(){
+  const ctx = document.getElementById('portChart'); if(!ctx)return;
+  const labels=[]; const data=[]; let v=USER.balance+USER.bonus;
+  for(let i=range;i>=0;i--){ labels.push(''); data.push(+(v*(1+(Math.random()-0.45)*0.03)).toFixed(2)); }
+  if(portChart)portChart.destroy();
+  const grad = ctx.getContext('2d').createLinearGradient(0,0,0,160);
+  grad.addColorStop(0,'rgba(0,184,212,.4)'); grad.addColorStop(1,'rgba(0,184,212,0)');
+  portChart = new Chart(ctx,{type:'line',data:{labels,datasets:[{data,borderColor:'#00b8d4',backgroundColor:grad,fill:true,tension:.4,pointRadius:0,borderWidth:2}]},options:{plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}}});
+}
+
+// boot
+initTheme(); updateThemeToggle(); applyI18n();
+renderTopbar(); greet(); updateKPIs(); renderPies(); drawChart();
+document.getElementById('chat').innerHTML = chatWidgetHTML();
+Market.init();
+setInterval(updateKPIs, 5000);
+</script>
+</body>
+</html>

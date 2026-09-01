@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign up — TradeVerse</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+<div id="nav"></div>
+<div class="auth-wrap">
+  <div class="card auth-card card-grad fade-up">
+    <div class="brand mb"><span class="brand-mark">T</span>TradeVerse</div>
+    <h2 class="h3 mb" data-i18n="signup_btn">Create account</h2>
+    <div class="chip mb" style="background:var(--accent-grad-soft);border-color:var(--accent);color:var(--accent)">🎁 <span data-i18n="signup_bonus">Sign up bonus</span>: <strong>$130</strong></div>
+    <div class="pink-chip mb" id="refBanner" style="display:none">🤝 <span data-i18n="ref_earn">Earn $50</span> <span data-i18n="ref_per_referral">per referral</span></div>
+    <form id="signupForm" onsubmit="return doSignup(event)">
+      <div class="field"><label data-i18n="login_email">Email</label><input class="input" type="email" id="su_name" placeholder="you@email.com" required></div>
+      <div class="field"><label>Full name</label><input class="input" type="text" id="su_fullname" placeholder="John Doe" required></div>
+      <div class="field"><label data-i18n="login_pass">Password</label><input class="input" type="password" id="su_pass" placeholder="Min 6 characters" required></div>
+      <div class="field"><label>Country</label>
+        <select class="input" id="su_country" required>
+          <option>United States</option><option>United Kingdom</option><option>United Arab Emirates</option><option>Germany</option><option>France</option><option>Spain</option><option>Portugal</option><option>Poland</option><option>Saudi Arabia</option><option>China</option><option>Japan</option><option>Singapore</option><option>Australia</option><option>Canada</option><option>Brazil</option><option>South Africa</option><option>India</option><option>Nigeria</option><option>Other</option>
+        </select>
+      </div>
+      <div class="field"><label>Referral code (optional)</label><input class="input" type="text" id="su_ref" placeholder="e.g. friend123"></div>
+      <button class="btn btn-primary btn-block btn-lg" type="submit" data-i18n="signup_btn">Create account</button>
+    </form>
+    <p class="center text-2 mt" style="font-size:.88rem">Already have an account? <a href="login.html" class="accent" style="font-weight:700" data-i18n="nav_login">Log in</a></p>
+    <p class="muted mt" style="font-size:.74rem;line-height:1.5" data-i18n="risk">Capital at risk. Investments can go down as well as up and you may get back less than you invested.</p>
+  </div>
+</div>
+<script src="js/i18n.js"></script>
+<script src="js/store.js"></script>
+<script src="js/market.js"></script>
+<script src="js/components.js"></script>
+<script>
+document.getElementById('nav').innerHTML = navHTML();
+initTheme(); updateThemeToggle(); applyI18n();
+// Auto-fill referral code from URL (?ref=CODE)
+(function(){
+  const params = new URLSearchParams(location.search);
+  const ref = params.get('ref');
+  if(ref){
+    document.getElementById('su_ref').value = ref;
+    document.getElementById('refBanner').style.display = 'inline-flex';
+  }
+})();
+function doSignup(e){
+  e.preventDefault();
+  const name = document.getElementById('su_fullname').value;
+  const email = document.getElementById('su_name').value;
+  const password = document.getElementById('su_pass').value;
+  const country = document.getElementById('su_country').value;
+  const referral = document.getElementById('su_ref').value;
+  if(password.length<6){ toast('Password must be at least 6 characters','error'); return false; }
+  const r = TV.signup({name,email,password,country,referral});
+  if(!r.ok){ toast(r.error,'error'); return false; }
+  toast('Account created! $130 bonus credited 🎉','success');
+  notifyEmail(r.user.id, 'Welcome to TradeVerse', `Hi ${r.user.name}, your account is ready and you received a $130 promotional credit.`);
+  setTimeout(()=>location.href='dashboard.html', 1200);
+  return false;
+}
+</script>
+</body>
+</html>

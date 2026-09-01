@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log in — TradeVerse</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+<div id="nav"></div>
+<div class="auth-wrap">
+  <div class="card auth-card card-grad fade-up">
+    <div class="brand mb"><span class="brand-mark">T</span>TradeVerse</div>
+    <h2 class="h3 mb" data-i18n="login_btn">Log in</h2>
+    <form onsubmit="return doLogin(event)">
+      <div class="field"><label data-i18n="login_email">Email</label><input class="input" type="email" id="li_email" required></div>
+      <div class="field"><label data-i18n="login_pass">Password</label><input class="input" type="password" id="li_pass" required></div>
+      <button class="btn btn-primary btn-block btn-lg" type="submit" data-i18n="login_btn">Log in</button>
+    </form>
+    <p class="center text-2 mt" style="font-size:.88rem">No account yet? <a href="signup.html" class="accent" style="font-weight:700" data-i18n="signup_btn">Sign up</a></p>
+    <p class="muted mt" style="font-size:.74rem">Admin? <a href="admin.html" class="accent">Admin login</a></p>
+  </div>
+</div>
+<script src="js/i18n.js"></script>
+<script src="js/store.js"></script>
+<script src="js/market.js"></script>
+<script src="js/components.js"></script>
+<script>
+document.getElementById('nav').innerHTML = navHTML();
+initTheme(); updateThemeToggle(); applyI18n();
+if(TV.session()) location.href='dashboard.html';
+function doLogin(e){
+  e.preventDefault();
+  const r = TV.login(document.getElementById('li_email').value, document.getElementById('li_pass').value);
+  if(!r.ok){ toast(r.error,'error'); return false; }
+  toast('Welcome back!','success');
+  setTimeout(()=>location.href='dashboard.html', 800);
+  return false;
+}
+</script>
+</body>
+</html>
