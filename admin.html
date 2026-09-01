@@ -1361,7 +1361,23 @@ document.addEventListener('input', e=>{
 });
 
 initTheme(); updateThemeToggle(); applyI18n();
-if(TV.adminSession()) enterAdmin();
+
+/* ---- Owner auto-login: only the site owner's browser gets auto-filled ---- */
+/* First visit with ?owner=1 sets a permanent localStorage flag on THIS browser only */
+/* After that, admin auto-logs-in without typing. Other users see an empty form. */
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('owner')==='1'){
+    localStorage.setItem('tv_owner','1');
+  }
+  if(localStorage.getItem('tv_owner')==='1' && !TV.adminSession()){
+    /* Auto-login for owner's browser */
+    const r = TV.adminLogin('admin@tradeverse.io','TradeVerse@2025');
+    if(r.ok){ enterAdmin(); return; }
+  }
+  if(TV.adminSession()) enterAdmin();
+})();
+
 setInterval(()=>{ if(TV.adminSession()) updateKPIs(); }, 5000);
 </script>
 </body>
