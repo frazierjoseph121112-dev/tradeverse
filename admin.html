@@ -6,6 +6,53 @@
 <title>Admin — TradeVerse</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/theme.css">
+<style>
+  .admin-nav-count{background:var(--accent);color:#fff;font-size:.68rem;padding:1px 7px;border-radius:10px;margin-left:6px;font-weight:700}
+  .admin-nav-count.warn{background:var(--pink)}
+  .email-preview{background:var(--bg);border:1px solid var(--border-2);border-radius:10px;padding:18px;margin:12px 0;font-size:.86rem;line-height:1.6;white-space:pre-wrap;max-height:400px;overflow-y:auto}
+  .email-preview .email-header{border-bottom:1px solid var(--border-2);padding-bottom:10px;margin-bottom:10px;font-size:.78rem;color:var(--text-2)}
+  .template-card{border:1px solid var(--border-2);border-radius:10px;padding:14px;margin-bottom:10px;cursor:pointer;transition:all .2s}
+  .template-card:hover{border-color:var(--accent);background:var(--chip)}
+  .template-card.selected{border-color:var(--accent);background:var(--chip)}
+  .template-card h5{font-size:.88rem;margin-bottom:4px}
+  .template-card p{font-size:.76rem;color:var(--text-2);margin:0}
+  .template-tabs{display:flex;gap:4px;margin-bottom:14px;flex-wrap:wrap}
+  .template-tab{padding:6px 14px;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;border:1px solid var(--border-2);background:var(--card);transition:all .2s}
+  .template-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .user-detail-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-2);font-size:.85rem}
+  .user-detail-row .lbl{color:var(--text-2);font-weight:600}
+  .kyc-doc-badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:.74rem;font-weight:600;margin:2px}
+  .kyc-doc-badge.has{background:rgba(0,200,100,.15);color:#0a0;border:1px solid #0a05}
+  .kyc-doc-badge.missing{background:rgba(255,100,100,.15);color:#c00;border:1px solid #c005}
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:500;padding:20px}
+  .modal-box{background:var(--card);border-radius:16px;padding:24px;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow)}
+  .modal-box h3{margin-bottom:16px}
+  .reason-box{background:var(--bg);border:1px solid var(--border-2);border-radius:10px;padding:14px;margin:10px 0}
+  .reason-box textarea{width:100%;background:var(--card);border:1px solid var(--border-2);border-radius:8px;padding:10px;font-size:.85rem;color:var(--text);resize:vertical;min-height:80px}
+  .act-row{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border-2)}
+  .act-row .act-time{font-size:.74rem;color:var(--text-dim);min-width:130px;white-space:nowrap}
+  .act-row .act-text{font-size:.84rem;flex:1}
+  .bal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:10px 0}
+  .bal-cell{text-align:center;padding:12px;border:1px solid var(--border-2);border-radius:10px}
+  .bal-cell .bal-lbl{font-size:.72rem;color:var(--text-dim)}
+  .bal-cell .bal-val{font-size:1.1rem;font-weight:800;margin-top:4px}
+  .kyc-status-badge{padding:3px 12px;border-radius:20px;font-size:.74rem;font-weight:700}
+  .kyc-status-badge.pending{background:#fff3cd;color:#856404}
+  .kyc-status-badge.approved{background:#d4edda;color:#155724}
+  .kyc-status-badge.rejected{background:#f8d7da;color:#721c24}
+  .kyc-status-badge.more_info{background:#d1ecf1;color:#0c5460}
+  .kyc-status-badge.not_submitted{background:var(--chip);color:var(--text-2)}
+  .admin-side-scroll{max-height:calc(100vh - 60px);overflow-y:auto}
+  .lang-flag{font-size:1rem}
+  .data-table{border-collapse:collapse;font-size:.84rem}
+  .data-table th{background:var(--chip);padding:10px 12px;text-align:left;font-weight:700;font-size:.76rem;text-transform:uppercase;letter-spacing:.04em;color:var(--text-2);border-bottom:2px solid var(--border-2)}
+  .data-table td{padding:10px 12px;border-bottom:1px solid var(--border-2);vertical-align:middle}
+  .data-table tr:hover td{background:var(--bg)}
+  .data-table .sym{display:inline-flex;align-items:center;gap:8px;font-weight:600}
+  .data-table .coin{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;font-size:.72rem;font-weight:700}
+  .btn-sm{padding:5px 12px;font-size:.76rem;border-radius:8px;border:1px solid var(--border-2);background:var(--card);cursor:pointer;font-weight:600}
+  .btn-sm:hover{border-color:var(--accent)}
+</style>
 <script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
 </head>
 <body>
@@ -25,24 +72,33 @@
 
 <!-- ADMIN SHELL -->
 <div id="adminShell" class="dash" style="display:none">
-  <aside class="dash-side">
+  <aside class="dash-side admin-side-scroll">
     <div class="side-brand"><span class="brand-mark">T</span>TradeVerse <span style="font-size:.7rem" class="chip">Admin</span></div>
     <nav class="side-nav">
       <a href="#" class="active" onclick="adminView('overview',event)">📊 Overview</a>
-      <a href="#" onclick="adminView('users',event)">👥 <span data-i18n="admin_users">Users</span></a>
-      <a href="#" onclick="adminView('deposits',event)">⬇️ <span data-i18n="admin_deposits">Deposits</span></a>
-      <a href="#" onclick="adminView('withdrawals',event)">⬆️ <span data-i18n="admin_withdrawals">Withdrawals</span></a>
-      <a href="#" onclick="adminView('messages',event)">💬 <span data-i18n="admin_messages">Messages</span></a>
-      <a href="#" onclick="adminView('wallets',event)">👛 <span data-i18n="admin_wallets">Wallets</span></a>
-      <a href="#" onclick="adminView('broadcast',event)">📢 <span data-i18n="admin_broadcast">Broadcast</span></a>
-      <a href="#" onclick="adminView('activity',event)">📜 <span data-i18n="admin_activity">Activity</span></a>
-      <a href="#" onclick="adminView('ai',event)">🤖 <span data-i18n="admin_ai">AI Monitor</span></a>
+      <a href="#" onclick="adminView('users',event)">👥 Users <span class="admin-nav-count" id="navUsers">0</span></a>
+      <a href="#" onclick="adminView('kyc',event)">🪪 KYC Review <span class="admin-nav-count warn" id="navKyc">0</span></a>
+      <a href="#" onclick="adminView('messages',event)">💬 Support Inbox <span class="admin-nav-count warn" id="navMsgs">0</span></a>
+      <a href="#" onclick="adminView('deposits',event)">⬇️ Deposits <span class="admin-nav-count warn" id="navDep">0</span></a>
+      <a href="#" onclick="adminView('withdrawals',event)">⬆️ Withdrawals <span class="admin-nav-count warn" id="navWd">0</span></a>
+      <a href="#" onclick="adminView('transactions',event)">⚡ Generate Transaction</a>
+      <a href="#" onclick="adminView('wallets',event)">👛 Wallets</a>
+      <a href="#" onclick="adminView('email',event)">📧 Email Center</a>
+      <a href="#" onclick="adminView('templates',event)">📝 Message Templates</a>
+      <a href="#" onclick="adminView('banklinks',event)">🏦 Bank Links <span class="admin-nav-count warn" id="navBank">0</span></a>
+      <a href="#" onclick="adminView('activity',event)">📋 User Activity Monitor</a>
+      <a href="#" onclick="adminView('alerts',event)">🔔 Admin Alerts <span class="admin-nav-count warn" id="navAlerts">0</span></a>
+      <a href="#" onclick="adminView('broadcast',event)">📢 Broadcast</a>
+      <a href="#" onclick="adminView('ai',event)">🤖 AI Monitor</a>
+      <a href="#" onclick="adminView('copytrading',event)">👥 Copy Trading</a>
+      <a href="#" onclick="adminView('competitions',event)">🏆 Competitions</a>
+      <a href="#" onclick="adminView('staking',event)">💰 Staking Pools</a>
       <a href="#" onclick="adminLogout()">🚪 Log out</a>
     </nav>
   </aside>
   <main class="dash-main">
     <div class="dash-topbar">
-      <h2 class="h3">Admin Dashboard</h2>
+      <h2 class="h3" id="adminTitle">Admin Dashboard</h2>
       <div style="margin-left:auto" class="flex gap">
         <span id="langSlot"></span>
         <button class="selector theme-toggle" onclick="toggleTheme()">🌙</button>
@@ -50,12 +106,19 @@
       </div>
     </div>
 
+    <!-- ===== OVERVIEW ===== -->
     <div id="av-overview" class="view">
       <div class="kpi-grid">
         <div class="card kpi admin-kpi"><div class="lbl">Total users</div><div class="val grad-text" id="aUsers">0</div></div>
         <div class="card kpi admin-kpi"><div class="lbl">Pending deposits</div><div class="val accent" id="aDep">0</div></div>
         <div class="card kpi admin-kpi"><div class="lbl">Pending withdrawals</div><div class="val accent" id="aWd">0</div></div>
+        <div class="card kpi admin-kpi"><div class="lbl">Pending KYC</div><div class="val accent" id="aKyc">0</div></div>
+      </div>
+      <div class="kpi-grid mt">
         <div class="card kpi admin-kpi"><div class="lbl">Unread support</div><div class="val accent" id="aMsg">0</div></div>
+        <div class="card kpi admin-kpi"><div class="lbl">Bank link requests</div><div class="val accent" id="aBank">0</div></div>
+        <div class="card kpi admin-kpi"><div class="lbl">Admin alerts</div><div class="val accent" id="aAlert">0</div></div>
+        <div class="card kpi admin-kpi"><div class="lbl">Total volume</div><div class="val grad-text" id="aVol">$0</div></div>
       </div>
       <div class="dash-grid-2 mt">
         <div class="card"><h3 class="mb">Recent users</h3><div id="recentUsers"></div></div>
@@ -63,75 +126,290 @@
       </div>
     </div>
 
+    <!-- ===== USERS ===== -->
     <div id="av-users" class="view hidden">
       <div class="card">
-        <div class="between mb"><h3 data-i18n="admin_users">Users</h3><input class="input" id="userSearch" data-i18n-ph="search_ph" placeholder="Search…" oninput="renderUsers()" style="max-width:240px"></div>
-        <div class="scroll-x"><table class="tbl"><thead><tr><th>Name</th><th>Email</th><th>Country</th><th>Balance</th><th>Bonus</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="usersBody"></tbody></table></div>
+        <div class="between mb"><h3>Users</h3><input class="input" id="userSearch" placeholder="Search…" oninput="renderUsers()" style="max-width:240px"></div>
+        <div class="scroll-x"><table class="tbl"><thead><tr><th>Name</th><th>Email</th><th>Country</th><th>Balance</th><th>KYC</th><th>Last Login</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="usersBody"></tbody></table></div>
       </div>
     </div>
 
-    <div id="av-deposits" class="view hidden">
-      <div class="card"><h3 class="mb" data-i18n="admin_deposits">Deposits</h3>
-        <div class="scroll-x"><table class="tbl"><thead><tr><th>User</th><th>Method</th><th>Amount</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="depBody"></tbody></table></div>
-        <p class="muted mt" style="font-size:.78rem">⚠️ Only approve after you verify the transaction on-chain. This keeps deposits real and verifiable.</p>
+    <!-- ===== KYC REVIEW ===== -->
+    <div id="av-kyc" class="view hidden">
+      <div class="card">
+        <h3 class="mb">KYC / Registration Review</h3>
+        <p class="text-2 mb" style="font-size:.86rem">Review submitted registration documents before approving user accounts. Click a user to see full details.</p>
+        <div class="scroll-x"><table class="tbl"><thead><tr><th>User</th><th>Email</th><th>Country</th><th>ID Type</th><th>Status</th><th>Submitted</th><th>Actions</th></tr></thead><tbody id="kycBody"></tbody></table></div>
       </div>
     </div>
 
-    <div id="av-withdrawals" class="view hidden">
-      <div class="card"><h3 class="mb" data-i18n="admin_withdrawals">Withdrawals</h3>
-        <div class="scroll-x"><table class="tbl"><thead><tr><th>User</th><th>Amount</th><th>Address</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="wdBody"></tbody></table></div>
-      </div>
-    </div>
-
+    <!-- ===== SUPPORT MESSAGES ===== -->
     <div id="av-messages" class="view hidden">
       <div class="dash-grid-2">
-        <div class="card"><h3 class="mb">Support inbox</h3><div id="supportList"></div></div>
-        <div class="card"><h3 class="mb">Conversation</h3><div id="convBody" style="max-height:340px;overflow-y:auto;margin-bottom:14px"></div>
-          <div class="chat-input" style="border:1px solid var(--border);border-radius:12px"><input class="input" id="adminReply" placeholder="Reply to user…" onkeydown="if(event.key==='Enter')adminSend()"><button class="btn btn-primary btn-sm" onclick="adminSend()" data-i18n="reply">Reply</button></div>
+        <div class="card">
+          <h3 class="mb">Support Inbox</h3>
+          <div id="supportList"></div>
+        </div>
+        <div class="card">
+          <div class="between mb">
+            <h3>Conversation</h3>
+            <div id="convLangInfo" style="font-size:.78rem"></div>
+          </div>
+          <div id="convBody" style="max-height:300px;overflow-y:auto;margin-bottom:14px;border:1px solid var(--border-2);border-radius:10px;padding:12px"></div>
+          <div class="between mb" style="font-size:.8rem">
+            <span class="text-2">User's language: <strong id="convUserLang">—</strong></span>
+            <button class="btn btn-ghost btn-sm" id="translateToggle" onclick="toggleTranslateMode()" style="display:none">🌐 Translate to English</button>
+          </div>
+          <div class="chat-input" style="border:1px solid var(--border);border-radius:12px">
+            <input class="input" id="adminReply" placeholder="Reply in English — user receives in their language…" onkeydown="if(event.key==='Enter')adminSend()">
+            <button class="btn btn-primary btn-sm" onclick="adminSend()">Reply</button>
+          </div>
+          <p class="muted mt" style="font-size:.76rem">💡 Your reply is automatically translated to the user's selected language. They see it in their native tongue.</p>
         </div>
       </div>
     </div>
 
-    <div id="av-wallets" class="view hidden">
-      <div class="card"><h3 class="mb" data-i18n="admin_wallets">Wallets</h3>
-        <div id="walletsAdmin"></div>
-        <p class="muted mt" style="font-size:.78rem">Edit deposit wallet addresses here. Users will see the updated addresses on their deposit page.</p>
+    <!-- ===== DEPOSITS ===== -->
+    <div id="av-deposits" class="view hidden">
+      <div class="card">
+        <h3 class="mb">Deposits</h3>
+        <div class="scroll-x"><table class="tbl"><thead><tr><th>User</th><th>Method</th><th>Amount</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="depBody"></tbody></table></div>
+        <p class="muted mt" style="font-size:.78rem">⚠️ Only approve after you verify the transaction on-chain. Use Review to hold, or Reject with a reason that triggers an email template.</p>
       </div>
     </div>
 
+    <!-- ===== WITHDRAWALS ===== -->
+    <div id="av-withdrawals" class="view hidden">
+      <div class="card">
+        <h3 class="mb">Withdrawals</h3>
+        <div class="scroll-x"><table class="tbl"><thead><tr><th>User</th><th>Amount</th><th>Address</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="wdBody"></tbody></table></div>
+        <p class="muted mt" style="font-size:.78rem">All withdrawals are held professionally until you toggle Approve, Reject, or Review. Rejections send an email template with the reason.</p>
+      </div>
+    </div>
+
+    <!-- ===== GENERATE TRANSACTION ===== -->
+    <div id="av-transactions" class="view hidden">
+      <div class="card" style="max-width:620px">
+        <h3 class="mb">Generate Transaction</h3>
+        <p class="text-2 mb" style="font-size:.86rem">Create a transaction for any user's account. You can backdate transactions to any date. The user will be notified via dashboard + email.</p>
+        <div class="field"><label>User</label><select class="input" id="genUser"></select></div>
+        <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="field"><label>Transaction type</label>
+            <select class="input" id="genType">
+              <option value="deposit">Deposit (credit)</option>
+              <option value="credit">Credit</option>
+              <option value="bonus">Bonus</option>
+              <option value="dividend">Dividend</option>
+              <option value="interest">Interest</option>
+              <option value="referral_bonus">Referral Bonus</option>
+              <option value="withdrawal">Withdrawal (debit)</option>
+              <option value="debit">Debit</option>
+              <option value="fee">Fee</option>
+              <option value="trade_profit">Trade Profit</option>
+              <option value="trade_loss">Trade Loss</option>
+            </select>
+          </div>
+          <div class="field"><label>Amount (USD)</label><input class="input" type="number" id="genAmount" value="100" step="0.01"></div>
+        </div>
+        <div class="field"><label>Description</label><input class="input" type="text" id="genDesc" placeholder="e.g. Quarterly dividend payment"></div>
+        <div class="field"><label>Transaction date (optional — leave blank for today)</label><input class="input" type="date" id="genDate"></div>
+        <div class="field"><label>Asset class (optional)</label>
+          <select class="input" id="genAssetClass">
+            <option value="">General account</option>
+            <option value="crypto">Cryptocurrency</option>
+            <option value="stocks">Stocks</option>
+            <option value="shares">Shares</option>
+            <option value="forex">Forex</option>
+            <option value="metals">Metals</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-block btn-lg" onclick="doGenerateTransaction()">Generate Transaction</button>
+        <div class="divider"></div>
+        <h4 class="mb">Recently Generated</h4>
+        <div id="genHistory" style="max-height:240px;overflow-y:auto"></div>
+      </div>
+    </div>
+
+    <!-- ===== WALLETS ===== -->
+    <div id="av-wallets" class="view hidden">
+      <div class="card">
+        <div class="between mb">
+          <h3>Wallet Management</h3>
+          <button class="btn btn-primary btn-sm" onclick="showAddWallet()">+ Add Wallet</button>
+        </div>
+        <p class="text-2 mb" style="font-size:.86rem">These are the crypto deposit wallets shown on the user dashboard. Edit addresses, add new wallets, or remove existing ones. Changes are instantly reflected for all users.</p>
+        <div id="walletsAdmin"></div>
+      </div>
+    </div>
+
+    <!-- ===== EMAIL CENTER ===== -->
+    <div id="av-email" class="view hidden">
+      <div class="card" style="max-width:680px">
+        <h3 class="mb">Email Center</h3>
+        <p class="text-2 mb" style="font-size:.86rem">Send individual or mass emails to users in official email format. Users receive them in their dashboard notifications AND email. Messages are sent in each user's selected language where possible.</p>
+        <div class="template-tabs">
+          <div class="template-tab active" onclick="setEmailMode('individual')">👤 Individual Email</div>
+          <div class="template-tab" onclick="setEmailMode('mass')">📢 Mass Email (All Users)</div>
+        </div>
+        <div id="emailIndividual">
+          <div class="field"><label>Recipient</label><select class="input" id="emailUser"></select></div>
+        </div>
+        <div id="emailMass" style="display:none">
+          <p class="chip" style="margin-bottom:10px">📢 This email will be sent to all <strong id="emailUserCount">0</strong> users</p>
+        </div>
+        <div class="field"><label>Quick template (optional)</label><select class="input" id="emailTemplateSelect" onchange="applyEmailTemplate()"><option value="">— Select a template —</option></select></div>
+        <div class="field"><label>Subject</label><input class="input" id="emailSubject" placeholder="Email subject…"></div>
+        <div class="field"><label>Message body</label><textarea class="input" id="emailBody" rows="6" placeholder="Type your message… Use {name} for the user's name"></textarea></div>
+        <button class="btn btn-primary btn-block btn-lg" onclick="sendEmail()">Send Email</button>
+        <div class="divider"></div>
+        <h4 class="mb">Email Preview</h4>
+        <div class="email-preview" id="emailPreview">
+          <div class="email-header"><strong>From:</strong> TradeVerse &lt;support@tradeverse.io&gt;<br><strong>Subject:</strong> <span id="previewSubject">—</span></div>
+          <div id="previewBody">Start typing to see a preview…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MESSAGE TEMPLATES ===== -->
+    <div id="av-templates" class="view hidden">
+      <div class="card" style="max-width:760px">
+        <h3 class="mb">Message Templates</h3>
+        <p class="text-2 mb" style="font-size:.86rem">Pre-written templates for promotional messages, referral campaigns, motivational content, rejection notices, and review updates. Click a template to use it in the Email Center.</p>
+        <div class="template-tabs" id="templateTabs"></div>
+        <div id="templateList"></div>
+      </div>
+    </div>
+
+    <!-- ===== BANK LINKS ===== -->
+    <div id="av-banklinks" class="view hidden">
+      <div class="card">
+        <h3 class="mb">Bank Link Requests</h3>
+        <p class="text-2 mb" style="font-size:.86rem">Review and approve/reject bank account link requests from users.</p>
+        <div class="scroll-x"><table class="tbl"><thead><tr><th>User</th><th>Bank</th><th>Account</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="bankBody"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- ===== USER ACTIVITY MONITOR ===== -->
+    <div id="av-activity" class="view hidden">
+      <div class="card">
+        <div class="between mb">
+          <h3>User Activity Monitor</h3>
+          <select class="input" id="actUserSelect" onchange="renderUserActivity()" style="max-width:280px"></select>
+        </div>
+        <div id="activityMonitor"></div>
+      </div>
+    </div>
+
+    <!-- ===== ADMIN ALERTS ===== -->
+    <div id="av-alerts" class="view hidden">
+      <div class="card">
+        <div class="between mb">
+          <h3>🔔 Admin Email Alerts</h3>
+          <button class="btn btn-ghost btn-sm" onclick="clearAlerts()">Clear all</button>
+        </div>
+        <p class="text-2 mb" style="font-size:.86rem">You receive an email notification here whenever a user contacts support, makes a deposit, places a withdrawal, submits KYC, or requests a bank link.</p>
+        <div id="alertsList"></div>
+      </div>
+    </div>
+
+    <!-- ===== BROADCAST ===== -->
     <div id="av-broadcast" class="view hidden">
       <div class="card" style="max-width:560px">
-        <h3 class="mb" data-i18n="admin_broadcast">Broadcast</h3>
-        <p class="text-2 mb" style="font-size:.88rem">Send a message to all users — appears in their notifications (and triggers email intent).</p>
+        <h3 class="mb">Broadcast</h3>
+        <p class="text-2 mb" style="font-size:.88rem">Send a message to all users — appears in their notifications and triggers email intent.</p>
+        <div class="field"><label>Quick template (optional)</label><select class="input" id="bcTemplateSelect" onchange="applyBcTemplate()"><option value="">— Select a template —</option></select></div>
         <div class="field"><label>Subject</label><input class="input" id="bcSub" placeholder="e.g. New trading hours"></div>
-        <div class="field"><label>Message</label><textarea class="input" id="bcBody" rows="4" placeholder="Your message…"></textarea></div>
-        <button class="btn btn-primary" onclick="doBroadcast()" data-i18n="send">Send</button>
+        <div class="field"><label>Message</label><textarea class="input" id="bcBody" rows="4" placeholder="Your message… Use {name} for personalization"></textarea></div>
+        <button class="btn btn-primary" onclick="doBroadcast()">Send to All Users</button>
         <div class="divider"></div>
         <h4 class="mb">Past broadcasts</h4><div id="bcList"></div>
       </div>
     </div>
 
-    <div id="av-activity" class="view hidden">
-      <div class="card"><h3 class="mb" data-i18n="admin_activity">Activity</h3><div id="actList"></div></div>
-    </div>
-
+    <!-- ===== AI MONITOR ===== -->
     <div id="av-ai" class="view hidden">
       <div class="dash-grid-2">
         <div class="card">
-          <h3 class="mb" data-i18n="admin_ai">AI Monitor</h3>
+          <h3 class="mb">AI Monitor</h3>
           <div class="kpi-grid" style="grid-template-columns:1fr 1fr">
             <div class="kpi"><div class="lbl">Dashboard sync</div><div class="val badge-up">● Live</div></div>
             <div class="kpi"><div class="lbl">Market feed</div><div class="val badge-up">● Live</div></div>
             <div class="kpi"><div class="lbl">Escalations</div><div class="val accent" id="aiEsc">0</div></div>
             <div class="kpi"><div class="lbl">Users monitored</div><div class="val" id="aiMon">0</div></div>
           </div>
-          <p class="text-2 mt" style="font-size:.88rem">The AI keeps every user dashboard in sync with live crypto/stock/forex data, answers support questions instantly, and notifies you (admin) by email + activity log when a user needs human help or an anomaly is flagged.</p>
+          <p class="text-2 mt" style="font-size:.88rem">The AI keeps every user dashboard in sync with live crypto/stock/forex data, answers support questions instantly, auto-credits deposits after approval, and notifies you (admin) by email + activity log when a user needs human help or an anomaly is flagged.</p>
         </div>
         <div class="card"><h3 class="mb">AI event log</h3><div id="aiLog"></div></div>
       </div>
     </div>
+
+    <!-- ===== Copy Trading Monitor ===== -->
+    <div id="av-copytrading" class="view hidden">
+      <div class="kpi-grid" style="margin-bottom:20px">
+        <div class="kpi"><div class="lbl">Total Traders</div><div class="val accent" id="ctTotalTraders">0</div></div>
+        <div class="kpi"><div class="lbl">Active Copiers</div><div class="val" id="ctActiveCopiers">0</div></div>
+        <div class="kpi"><div class="lbl">Total AUM Copied</div><div class="val" id="ctAum">0</div></div>
+        <div class="kpi"><div class="lbl">Avg ROI (30d)</div><div class="val badge-up" id="ctAvgRoi">0%</div></div>
+      </div>
+      <div class="card">
+        <h3 class="mb">👥 Copy Trading Traders</h3>
+        <p class="text-2 mb" style="font-size:.85rem">Monitor all copy traders on the platform. View their performance, number of followers, and total assets under management.</p>
+        <div id="ctTradersTable"></div>
+      </div>
+    </div>
+
+    <!-- ===== Competition Management ===== -->
+    <div id="av-competitions" class="view hidden">
+      <div class="card" style="margin-bottom:20px">
+        <h3 class="mb">🏆 Create New Competition</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-items:end">
+          <div><label class="text-2" style="font-size:.78rem">Title</label><input id="compTitle" class="form-input" placeholder="Bitcoin Masters Cup" /></div>
+          <div><label class="text-2" style="font-size:.78rem">Prize Pool ($)</label><input id="compPrize" class="form-input" type="number" placeholder="10000" /></div>
+          <div><label class="text-2" style="font-size:.78rem">Type</label><select id="compType" class="form-input"><option value="trading">Trading</option><option value="forex">Forex</option><option value="crypto">Crypto</option></select></div>
+          <div><label class="text-2" style="font-size:.78rem">Duration (days)</label><input id="compDays" class="form-input" type="number" placeholder="30" /></div>
+          <button class="btn btn-primary" onclick="adminCreateComp()">Create Competition</button>
+        </div>
+      </div>
+      <div class="kpi-grid" style="margin-bottom:20px">
+        <div class="kpi"><div class="lbl">Active Competitions</div><div class="val accent" id="compActive">0</div></div>
+        <div class="kpi"><div class="lbl">Total Participants</div><div class="val" id="compParticipants">0</div></div>
+        <div class="kpi"><div class="lbl">Total Prize Pool</div><div class="val" id="compTotalPrize">$0</div></div>
+      </div>
+      <div class="card">
+        <h3 class="mb">All Competitions</h3>
+        <div id="compTable"></div>
+      </div>
+    </div>
+
+    <!-- ===== Staking Pool Management ===== -->
+    <div id="av-staking" class="view hidden">
+      <div class="card" style="margin-bottom:20px">
+        <h3 class="mb">💰 Create Staking Pool</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-items:end">
+          <div><label class="text-2" style="font-size:.78rem">Asset Name</label><input id="stakeAsset" class="form-input" placeholder="Ethereum" /></div>
+          <div><label class="text-2" style="font-size:.78rem">Symbol</label><input id="stakeSym" class="form-input" placeholder="ETH" /></div>
+          <div><label class="text-2" style="font-size:.78rem">APY (%)</label><input id="stakeApy" class="form-input" type="number" step="0.1" placeholder="5.5" /></div>
+          <div><label class="text-2" style="font-size:.78rem">Lock (days)</label><input id="stakeLock" class="form-input" type="number" placeholder="90" /></div>
+          <div><label class="text-2" style="font-size:.78rem">Min Stake</label><input id="stakeMin" class="form-input" type="number" placeholder="100" /></div>
+          <button class="btn btn-primary" onclick="adminCreatePool()">Create Pool</button>
+        </div>
+      </div>
+      <div class="kpi-grid" style="margin-bottom:20px">
+        <div class="kpi"><div class="lbl">Active Pools</div><div class="val accent" id="spActive">0</div></div>
+        <div class="kpi"><div class="lbl">Total Staked (TVL)</div><div class="val" id="spTvl">$0</div></div>
+        <div class="kpi"><div class="lbl">Total Stakers</div><div class="val" id="spStakers">0</div></div>
+        <div class="kpi"><div class="lbl">Avg APY</div><div class="val badge-up" id="spAvgApy">0%</div></div>
+      </div>
+      <div class="card">
+        <h3 class="mb">All Staking Pools</h3>
+        <div id="spTable"></div>
+      </div>
+    </div>
   </main>
 </div>
+
+<!-- MODAL CONTAINER -->
+<div id="modalContainer"></div>
 
 <script src="js/i18n.js"></script>
 <script src="js/store.js"></script>
@@ -139,6 +417,12 @@
 <script src="js/components.js"></script>
 <script>
 let currentConvUser = null;
+let translateMode = false;
+let currentTemplateCategory = 'promotional';
+let emailMode = 'individual';
+
+const langNames = {en:'English',es:'Spanish',fr:'French',de:'German',pt:'Portuguese',pl:'Polish',ar:'Arabic',zh:'Chinese'};
+const langFlags = {en:'🇬🇧',es:'🇪🇸',fr:'🇫🇷',de:'🇩🇪',pt:'🇵🇹',pl:'🇵🇱',ar:'🇸🇦',zh:'🇨🇳'};
 
 function doAdminLogin(e){
   e.preventDefault();
@@ -147,118 +431,924 @@ function doAdminLogin(e){
   enterAdmin();
   return false;
 }
+
 function enterAdmin(){
   document.getElementById('adminLogin').style.display='none';
   document.getElementById('adminShell').style.display='grid';
   document.getElementById('langSlot').outerHTML = buildLangSelector();
-  applyI18n(); updateKPIs();
+  applyI18n();
+  updateKPIs();
   renderOverview();
 }
+
 function adminLogout(){ TV.setAdmin(false); location.reload(); }
+
 function adminView(v,e){ if(e)e.preventDefault();
   document.querySelectorAll('#adminShell .view').forEach(x=>x.classList.add('hidden'));
   document.getElementById('av-'+v).classList.remove('hidden');
   document.querySelectorAll('#adminShell .side-nav a').forEach(a=>a.classList.remove('active'));
-  e.currentTarget.classList.add('active');
+  if(e&&e.currentTarget) e.currentTarget.classList.add('active');
+  const titles = {
+    overview:'Admin Dashboard', users:'User Management', kyc:'KYC Review',
+    messages:'Support Inbox', deposits:'Deposit Approvals', withdrawals:'Withdrawal Approvals',
+    transactions:'Generate Transaction', wallets:'Wallet Management', email:'Email Center',
+    templates:'Message Templates', banklinks:'Bank Link Requests', activity:'User Activity Monitor',
+    alerts:'Admin Alerts', broadcast:'Broadcast', ai:'AI Monitor',
+    copytrading:'Copy Trading Monitor', competitions:'Competition Management', staking:'Staking Pool Management'
+  };
+  document.getElementById('adminTitle').textContent = titles[v]||'Admin';
   if(v==='overview')renderOverview();
   if(v==='users')renderUsers();
+  if(v==='kyc')renderKYC();
+  if(v==='messages')renderSupport();
   if(v==='deposits')renderDeposits();
   if(v==='withdrawals')renderWithdrawals();
-  if(v==='messages')renderSupport();
+  if(v==='transactions')renderGenTransaction();
   if(v==='wallets')renderWalletsAdmin();
+  if(v==='email')renderEmailCenter();
+  if(v==='templates')renderTemplates();
+  if(v==='banklinks')renderBankLinks();
+  if(v==='activity')renderActivityMonitor();
+  if(v==='alerts')renderAlerts();
   if(v==='broadcast')renderBroadcasts();
-  if(v==='activity')renderActivity();
   if(v==='ai')renderAI();
+  if(v==='copytrading')renderAdminCopyTraders();
+  if(v==='competitions')renderAdminCompetitions();
+  if(v==='staking')renderAdminStaking();
 }
+
 function updateKPIs(){
   const d=TV.load();
   document.getElementById('aUsers').textContent=d.users.length;
   document.getElementById('aDep').textContent=d.deposits.filter(x=>x.status==='pending').length;
   document.getElementById('aWd').textContent=d.withdrawals.filter(x=>x.status==='pending').length;
+  document.getElementById('aKyc').textContent=(d.kycReviews||[]).filter(x=>x.status==='pending').length;
   const unread = Object.entries(d.support).filter(([uid,msgs])=>msgs.some(m=>m.from==='user')).length;
   document.getElementById('aMsg').textContent=unread;
+  document.getElementById('aBank').textContent=(d.bankLinks||[]).filter(x=>x.status==='pending').length;
+  document.getElementById('aAlert').textContent=(d.adminAlerts||[]).length;
+  const vol = d.deposits.filter(x=>x.status==='completed').reduce((s,x)=>s+x.amount,0);
+  document.getElementById('aVol').textContent='$'+vol.toLocaleString();
+  // Nav counts
+  const setNav=(id,val)=>{const el=document.getElementById(id); if(el)el.textContent=val;};
+  setNav('navUsers', d.users.length);
+  setNav('navKyc', (d.kycReviews||[]).filter(x=>x.status==='pending').length);
+  setNav('navMsgs', unread);
+  setNav('navDep', d.deposits.filter(x=>x.status==='pending').length);
+  setNav('navWd', d.withdrawals.filter(x=>x.status==='pending').length);
+  setNav('navBank', (d.bankLinks||[]).filter(x=>x.status==='pending').length);
+  setNav('navAlerts', (d.adminAlerts||[]).length);
 }
+
 function renderOverview(){
   const d=TV.load();
-  document.getElementById('recentUsers').innerHTML = d.users.slice(-5).reverse().map(u=>`<div class="watch-item"><span class="sym"><span class="coin">${u.name.slice(0,2).toUpperCase()}</span>${u.name}</span><span class="muted">${u.email}</span></div>`).join('') || '<p class="muted center" style="padding:18px">No users yet.</p>';
+  document.getElementById('recentUsers').innerHTML = d.users.slice(-5).reverse().map(u=>{
+    const kycBadge = `<span class="kyc-status-badge ${u.kycStatus||'not_submitted'}">${(u.kycStatus||'none').replace('_',' ')}</span>`;
+    return `<div class="watch-item" style="cursor:pointer" onclick="adminView('users',{preventDefault:()=>{},currentTarget:{classList:{add:()=>{}}}})"><span class="sym"><span class="coin">${u.name.slice(0,2).toUpperCase()}</span>${u.name}</span><span class="muted" style="font-size:.78rem">${u.email} ${kycBadge}</span></div>`;
+  }).join('') || '<p class="muted center" style="padding:18px">No users yet.</p>';
   document.getElementById('recentAct').innerHTML = d.activity.slice(-8).reverse().map(a=>`<div class="watch-item"><span class="text-2" style="font-size:.85rem">${a.text}</span><span class="muted" style="font-size:.75rem">${new Date(a.ts).toLocaleTimeString()}</span></div>`).join('') || '<p class="muted center" style="padding:18px">No activity yet.</p>';
   updateKPIs();
 }
+
+/* ===== USERS ===== */
 function renderUsers(){
   const d=TV.load(); const q=(document.getElementById('userSearch')?.value||'').toLowerCase();
   const list = d.users.filter(u=>!q||u.name.toLowerCase().includes(q)||u.email.includes(q));
-  document.getElementById('usersBody').innerHTML = list.map(u=>`<tr>
+  document.getElementById('usersBody').innerHTML = list.map(u=>{
+    const lastLogin = u.lastLogin ? new Date(u.lastLogin).toLocaleDateString() : 'Never';
+    const kycBadge = `<span class="kyc-status-badge ${u.kycStatus||'not_submitted'}">${(u.kycStatus||'none').replace('_',' ')}</span>`;
+    return `<tr>
     <td class="sym"><span class="coin">${u.name.slice(0,2).toUpperCase()}</span>${u.name}</td>
-    <td>${u.email}</td><td>${u.country}</td><td>$${u.balance.toFixed(2)}</td><td class="accent">$${u.bonus}</td>
-    <td>${new Date(u.joined).toLocaleDateString()}</td>
-    <td><button class="btn btn-ghost btn-sm" onclick="openConv('${u.id}')">Message</button></td></tr>`).join('') || '<tr><td colspan="7" class="muted center" style="padding:18px">No users.</td></tr>';
+    <td>${u.email}</td><td>${u.country}</td><td>$${(u.balance||0).toFixed(2)}</td>
+    <td>${kycBadge}</td><td>${lastLogin}</td><td>${new Date(u.joined).toLocaleDateString()}</td>
+    <td><button class="btn btn-primary btn-sm" onclick="viewUserDetail('${u.id}')">View</button> <button class="btn btn-ghost btn-sm" onclick="openConv('${u.id}')">Message</button></td></tr>`;
+  }).join('') || '<tr><td colspan="8" class="muted center" style="padding:18px">No users.</td></tr>';
 }
-function renderDeposits(){
-  const d=TV.load();
-  document.getElementById('depBody').innerHTML = d.deposits.slice().reverse().map(x=>{ const u=TV.getUser(x.userId); return `<tr>
-    <td>${u?u.email:x.userId}</td><td>${x.method}</td><td>$${x.amount}</td>
-    <td><span class="tag ${x.status==='completed'?'tag-ok':x.status==='pending'?'tag-pend':'tag-no'}">${x.status}</span></td>
-    <td>${new Date(x.ts).toLocaleString()}</td>
-    <td>${x.status==='pending'?`<button class="btn btn-primary btn-sm" onclick="approveDep('${x.id}')">${t('approve')}</button> <button class="btn btn-ghost btn-sm" onclick="rejectDep('${x.id}')">${t('reject')}</button>`:'—'}</td></tr>`; }).join('') || '<tr><td colspan="6" class="muted center" style="padding:18px">No deposits.</td></tr>';
-}
-function renderWithdrawals(){
-  const d=TV.load();
-  document.getElementById('wdBody').innerHTML = d.withdrawals.slice().reverse().map(x=>{ const u=TV.getUser(x.userId); return `<tr>
-    <td>${u?u.email:x.userId}</td><td>$${x.amount}</td><td style="font-family:monospace;font-size:.78rem">${(x.addr||'').slice(0,18)}…</td>
-    <td><span class="tag ${x.status==='completed'?'tag-ok':x.status==='pending'?'tag-pend':'tag-no'}">${x.status}</span></td>
-    <td>${new Date(x.ts).toLocaleString()}</td>
-    <td>${x.status==='pending'?`<button class="btn btn-primary btn-sm" onclick="approveWd('${x.id}')">${t('approve')}</button> <button class="btn btn-ghost btn-sm" onclick="rejectWd('${x.id}')">${t('reject')}</button>`:'—'}</td></tr>`; }).join('') || '<tr><td colspan="6" class="muted center" style="padding:18px">No withdrawals.</td></tr>';
-}
-function approveDep(id){ TV.approveDeposit(id); const dep=TV.load().deposits.find(x=>x.id===id); if(dep)notifyEmail(dep.userId,'Deposit confirmed',`Your deposit of $${dep.amount} was credited.`); toast('Deposit approved','success'); renderDeposits(); renderOverview(); }
-function rejectDep(id){ TV.rejectDeposit(id); toast('Deposit rejected','warn'); renderDeposits(); }
-function approveWd(id){ TV.approveWithdrawal(id); const wd=TV.load().withdrawals.find(x=>x.id===id); if(wd)notifyEmail(wd.userId,'Withdrawal processed',`Your withdrawal of $${wd.amount} was sent.`); toast('Withdrawal approved','success'); renderWithdrawals(); renderOverview(); }
-function rejectWd(id){ TV.rejectWithdrawal(id); toast('Withdrawal rejected','warn'); renderWithdrawals(); }
 
+function viewUserDetail(uid){
+  const u = TV.getUser(uid);
+  if(!u) return;
+  const kyc = u.kyc || {};
+  const act = TV.getUserActivity(uid);
+  const d = TV.load();
+  const userDeps = d.deposits.filter(x=>x.userId===uid);
+  const userWds = d.withdrawals.filter(x=>x.userId===uid);
+  const bal = u.balances || {};
+  const kycStatusBadge = `<span class="kyc-status-badge ${u.kycStatus||'not_submitted'}">${(u.kycStatus||'not submitted').replace('_',' ')}</span>`;
+
+  let kycDocsHtml = '';
+  if(kyc.idFileName) kycDocsHtml += `<span class="kyc-doc-badge has">✓ ID: ${kyc.idFileName}</span>`;
+  else kycDocsHtml += `<span class="kyc-doc-badge missing">✗ No ID uploaded</span>`;
+  if(kyc.addrProofFile) kycDocsHtml += `<span class="kyc-doc-badge has">✓ Address proof: ${kyc.addrProofFile}</span>`;
+  if(kyc.bankStatementFile) kycDocsHtml += `<span class="kyc-doc-badge has">✓ Bank statement: ${kyc.bankStatementFile}</span>`;
+
+  const modal = `
+    <div class="modal-overlay" onclick="closeModal(event)">
+      <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="between mb"><h3>User Details — ${u.name}</h3><button onclick="closeModal()" style="font-size:1.4rem;background:none;border:none;color:var(--text-2);cursor:pointer">✕</button></div>
+        <div class="user-detail-row"><span class="lbl">Email</span><span>${u.email}</span></div>
+        <div class="user-detail-row"><span class="lbl">Country</span><span>${u.country} ${langFlags[u.lang]||''}</span></div>
+        <div class="user-detail-row"><span class="lbl">Language</span><span>${langNames[u.lang]||u.lang}</span></div>
+        <div class="user-detail-row"><span class="lbl">KYC Status</span><span>${kycStatusBadge}</span></div>
+        <div class="user-detail-row"><span class="lbl">Joined</span><span>${new Date(u.joined).toLocaleString()}</span></div>
+        <div class="user-detail-row"><span class="lbl">Last login</span><span>${u.lastLogin?new Date(u.lastLogin).toLocaleString():'Never'}</span></div>
+        <div class="user-detail-row"><span class="lbl">Total logins</span><span>${(u.loginHistory||[]).length}</span></div>
+        <div class="user-detail-row"><span class="lbl">Referral code</span><span><strong>${u.referralCode||'—'}</strong></span></div>
+        <div class="user-detail-row"><span class="lbl">Referral earnings</span><span>$${u.referralEarnings||0}</span></div>
+
+        <h4 style="margin-top:16px;margin-bottom:8px">Balances</h4>
+        <div class="bal-grid">
+          <div class="bal-cell"><div class="bal-lbl">Total</div><div class="bal-val grad-text">$${(u.balance||0).toFixed(2)}</div></div>
+          <div class="bal-cell"><div class="bal-lbl">Bonus</div><div class="bal-val accent">$${(u.bonus||0).toFixed(2)}</div></div>
+          <div class="bal-cell"><div class="bal-lbl">Crypto</div><div class="bal-val">$${(bal.crypto||0).toFixed(2)}</div></div>
+          <div class="bal-cell"><div class="bal-lbl">Stocks</div><div class="bal-val">$${(bal.stocks||0).toFixed(2)}</div></div>
+          <div class="bal-cell"><div class="bal-lbl">Shares</div><div class="bal-val">$${(bal.shares||0).toFixed(2)}</div></div>
+          <div class="bal-cell"><div class="bal-lbl">Forex</div><div class="bal-val">$${(bal.forex||0).toFixed(2)}</div></div>
+          <div class="bal-cell"><div class="bal-lbl">Metals</div><div class="bal-val">$${(bal.metals||0).toFixed(2)}</div></div>
+        </div>
+
+        ${kyc.idType ? `
+        <h4 style="margin-top:16px;margin-bottom:8px">KYC / Registration Details</h4>
+        <div class="user-detail-row"><span class="lbl">Legal name</span><span>${kyc.firstName||''} ${kyc.lastName||''}</span></div>
+        <div class="user-detail-row"><span class="lbl">Date of birth</span><span>${kyc.dob||'—'}</span></div>
+        <div class="user-detail-row"><span class="lbl">Phone</span><span>${kyc.phone||'—'}</span></div>
+        <div class="user-detail-row"><span class="lbl">Address</span><span>${kyc.address||'—'}, ${kyc.city||''} ${kyc.zip||''}</span></div>
+        <div class="user-detail-row"><span class="lbl">ID type</span><span>${kyc.idType||'—'}</span></div>
+        <div class="user-detail-row"><span class="lbl">Employment</span><span>${kyc.employment||'—'}</span></div>
+        <div class="user-detail-row"><span class="lbl">Annual income</span><span>${kyc.income||'—'}</span></div>
+        <div class="user-detail-row"><span class="lbl">Net worth</span><span>${kyc.netWorth||'—'}</span></div>
+        <div class="user-detail-row"><span class="lbl">Experience</span><span>${kyc.expLevel||'—'}</span></div>
+        <div class="user-detail-row"><span class="lbl">Objectives</span><span>${kyc.objectives||'—'}</span></div>
+        <div class="user-detail-row"><span class="lbl">Risk tolerance</span><span>${kyc.riskTolerance||'—'}</span></div>
+        <div class="user-detail-row"><span class="lbl">Funding method</span><span>${kyc.fundingMethod||'—'}</span></div>
+        ${kyc.bankName ? `<div class="user-detail-row"><span class="lbl">Bank</span><span>${kyc.bankName}</span></div>` : ''}
+        <div style="margin-top:10px">${kycDocsHtml}</div>
+        ` : '<p class="muted mt" style="font-size:.82rem">No KYC data submitted.</p>'}
+
+        <h4 style="margin-top:16px;margin-bottom:8px">Recent Activity (${act.length} total)</h4>
+        <div style="max-height:200px;overflow-y:auto">
+          ${act.slice(-15).reverse().map(a=>`<div class="act-row"><span class="act-time">${new Date(a.ts).toLocaleString()}</span><span class="act-text"><span class="tag tag-info">${a.action}</span> ${a.detail}</span></div>`).join('') || '<p class="muted">No activity recorded.</p>'}
+        </div>
+
+        <h4 style="margin-top:16px;margin-bottom:8px">Deposits (${userDeps.length})</h4>
+        <div style="max-height:120px;overflow-y:auto;font-size:.8rem">
+          ${userDeps.map(x=>`<div class="act-row"><span class="act-time">${new Date(x.ts).toLocaleDateString()}</span><span class="act-text">$${x.amount} via ${x.method} — <span class="tag ${x.status==='completed'?'tag-ok':x.status==='pending'?'tag-pend':'tag-no'}">${x.status}</span></span></div>`).join('') || '<p class="muted">No deposits.</p>'}
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap">
+          ${u.kycStatus==='pending' ? `<button class="btn btn-primary btn-sm" onclick="approveKYC('${u.id}')">✓ Approve KYC</button><button class="btn btn-ghost btn-sm" onclick="rejectKYCModal('${u.id}')">✗ Reject KYC</button><button class="btn btn-ghost btn-sm" onclick="moreInfoKYCModal('${u.id}')">ℹ Request More Info</button>` : ''}
+          <button class="btn btn-primary btn-sm" onclick="closeModal();adminView('transactions',{preventDefault:()=>{},currentTarget:{classList:{add:()=>{}}}});setTimeout(()=>{document.getElementById('genUser').value='${u.id}'},100)">⚡ Generate Transaction</button>
+          <button class="btn btn-ghost btn-sm" onclick="closeModal();openConv('${u.id}')">💬 Message</button>
+          <button class="btn btn-ghost btn-sm" onclick="closeModal();adminView('email',{preventDefault:()=>{},currentTarget:{classList:{add:()=>{}}}});setTimeout(()=>{document.getElementById('emailUser').value='${u.id}';updateEmailPreview()},100)">📧 Send Email</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modalContainer').innerHTML = modal;
+}
+
+function closeModal(e){ if(e && e.target!==e.currentTarget) return; document.getElementById('modalContainer').innerHTML=''; }
+
+/* ===== KYC REVIEW ===== */
+function renderKYC(){
+  const d=TV.load();
+  const kycList = (d.kycReviews||[]).filter(k=>k.status==='pending');
+  const submittedUsers = d.users.filter(u=>u.kycStatus==='pending');
+  // Merge: show users with pending KYC
+  document.getElementById('kycBody').innerHTML = submittedUsers.map(u=>{
+    const kyc = u.kyc || {};
+    return `<tr>
+      <td class="sym"><span class="coin">${u.name.slice(0,2).toUpperCase()}</span>${u.name}</td>
+      <td>${u.email}</td><td>${u.country}</td><td>${kyc.idType||'—'}</td>
+      <td><span class="kyc-status-badge ${u.kycStatus}">${u.kycStatus.replace('_',' ')}</span></td>
+      <td>${kyc.submittedAt?new Date(kyc.submittedAt).toLocaleDateString():new Date(u.joined).toLocaleDateString()}</td>
+      <td><button class="btn btn-primary btn-sm" onclick="viewUserDetail('${u.id}')">Review</button></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="7" class="muted center" style="padding:18px">No pending KYC reviews.</td></tr>';
+}
+
+function approveKYC(uid){
+  TV.approveKYC(uid);
+  const u = TV.getUser(uid);
+  notifyEmail(uid, 'Account Verification Approved', `Dear ${u.name},\n\nYour account verification has been approved! You now have full access to all TradeVerse features including withdrawals.\n\nWelcome aboard!\nThe TradeVerse Team`);
+  toast('KYC approved — user notified','success');
+  closeModal();
+  renderKYC(); updateKPIs();
+}
+function rejectKYCModal(uid){
+  const u = TV.getUser(uid);
+  const modal = `
+  <div class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-box" style="max-width:500px" onclick="event.stopPropagation()">
+      <h3 class="mb">Reject KYC — ${u.name}</h3>
+      <div class="reason-box"><label style="font-size:.85rem;font-weight:600">Reason for rejection</label><textarea id="kycRejectReason" placeholder="e.g. ID image is blurry, please re-upload a clear photo…"></textarea></div>
+      <div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doRejectKYC('${uid}')">Reject & Notify</button></div>
+    </div>
+  </div>`;
+  document.getElementById('modalContainer').innerHTML = modal;
+}
+function doRejectKYC(uid){
+  const reason = document.getElementById('kycRejectReason').value.trim() || 'Documents could not be verified. Please re-submit with clear, high-quality images.';
+  TV.rejectKYC(uid, reason);
+  const u = TV.getUser(uid);
+  const tmpl = TV.load().templates.rejection.find(t=>t.id==='rej3');
+  const body = (tmpl?tmpl.body:'Your verification documents could not be approved. Reason: {reason}').replace('{name}',u.name).replace('{reason}',reason);
+  notifyEmail(uid, tmpl?tmpl.subject:'Account Verification — Action Needed', body);
+  toast('KYC rejected — email sent to user','warn');
+  closeModal(); renderKYC(); updateKPIs();
+}
+function moreInfoKYCModal(uid){
+  const u = TV.getUser(uid);
+  const modal = `
+  <div class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-box" style="max-width:500px" onclick="event.stopPropagation()">
+      <h3 class="mb">Request More Info — ${u.name}</h3>
+      <div class="reason-box"><label style="font-size:.85rem;font-weight:600">What additional information is needed?</label><textarea id="kycMoreInfoReason" placeholder="e.g. Please provide the back side of your ID…"></textarea></div>
+      <div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doMoreInfoKYC('${uid}')">Request Info & Notify</button></div>
+    </div>
+  </div>`;
+  document.getElementById('modalContainer').innerHTML = modal;
+}
+function doMoreInfoKYC(uid){
+  const reason = document.getElementById('kycMoreInfoReason').value.trim() || 'Additional documentation is required to complete your verification.';
+  TV.requestMoreInfoKYC(uid, reason);
+  const u = TV.getUser(uid);
+  notifyEmail(uid, 'Additional Information Needed for Verification', `Dear ${u.name},\n\nWe need additional information to complete your account verification: ${reason}\n\nPlease log in to your dashboard and re-submit the required documents.\n\nThe TradeVerse Team`);
+  toast('More info requested — user notified','success');
+  closeModal(); renderKYC(); updateKPIs();
+}
+
+/* ===== SUPPORT MESSAGES ===== */
 function renderSupport(){
   const d=TV.load();
   const threads = Object.entries(d.support).filter(([uid,msgs])=>msgs.length);
-  document.getElementById('supportList').innerHTML = threads.map(([uid,msgs])=>{ const u=TV.getUser(uid); const last=msgs[msgs.length-1]; return `<div class="watch-item" style="cursor:pointer" onclick="openConv('${uid}')"><span class="sym"><span class="coin">${(u?u.name:'?').slice(0,2).toUpperCase()}</span>${u?u.name:uid}</span><span class="muted" style="font-size:.78rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${last.text}</span></div>`; }).join('') || '<p class="muted center" style="padding:18px">No support messages yet.</p>';
+  document.getElementById('supportList').innerHTML = threads.map(([uid,msgs])=>{
+    const u=TV.getUser(uid); const last=msgs[msgs.length-1];
+    const hasUnread = msgs.some(m=>m.from==='user');
+    const langBadge = u ? `${langFlags[u.lang]||''}` : '';
+    return `<div class="watch-item" style="cursor:pointer" onclick="openConv('${uid}')">
+      <span class="sym"><span class="coin">${(u?u.name:'?').slice(0,2).toUpperCase()}</span>${u?u.name:uid} ${langBadge}</span>
+      <span class="muted" style="font-size:.76rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${last.text}</span>
+      ${hasUnread?'<span class="dot dot-up" style="align-self:center"></span>':''}
+    </div>`;
+  }).join('') || '<p class="muted center" style="padding:18px">No support messages yet.</p>';
 }
+
 function openConv(uid){
   currentConvUser = uid;
+  translateMode = false;
   adminView('messages',{preventDefault:()=>{},currentTarget:{classList:{add:()=>{}}}});
-  renderConv();
+  renderConv(); renderSupport();
 }
+
 function renderConv(){
   const d=TV.load(); const msgs = d.support[currentConvUser]||[]; const u=TV.getUser(currentConvUser);
-  document.getElementById('convBody').innerHTML = `<div class="muted mb" style="font-size:.8rem">${u?u.name+' · '+u.email:currentConvUser}</div>` + msgs.map(m=>`<div class="chat-msg ${m.from==='user'?'bot':'me'}" style="margin-bottom:8px">${m.text}</div>`).join('') || '<p class="muted">No messages.</p>';
+  const userLang = u ? u.lang : 'en';
+  document.getElementById('convUserLang').textContent = `${langFlags[userLang]||''} ${langNames[userLang]||userLang}`;
+  const toggleBtn = document.getElementById('translateToggle');
+  if(toggleBtn){
+    toggleBtn.style.display = userLang!=='en' ? '' : 'none';
+    toggleBtn.textContent = translateMode ? '🔤 Show Original' : '🌐 Translate to English';
+  }
+  document.getElementById('convBody').innerHTML = `<div class="muted mb" style="font-size:.8rem">${u?u.name+' · '+u.email:currentConvUser}</div>` + msgs.map(m=>{
+    let displayText = m.text;
+    if(translateMode && m.from==='user' && m.lang && m.lang!=='en'){
+      displayText = TV.translateText(m.text, m.lang, 'en');
+      if(displayText===m.text) displayText = `[Original: ${m.lang}] ${m.text}`;
+      else displayText = `[EN] ${displayText}`;
+    }
+    const langTag = m.lang && m.lang!=='en' ? ` <span style="font-size:.68rem;opacity:.6">${langFlags[m.lang]||m.lang}</span>` : '';
+    return `<div class="chat-msg ${m.from==='user'?'bot':'me'}" style="margin-bottom:8px">${displayText}${langTag}<div style="font-size:.68rem;opacity:.5;margin-top:2px">${new Date(m.ts).toLocaleTimeString()}</div></div>`;
+  }).join('') || '<p class="muted">No messages.</p>';
+  document.getElementById('convBody').scrollTop = document.getElementById('convBody').scrollHeight;
 }
+
+function toggleTranslateMode(){
+  translateMode = !translateMode;
+  renderConv();
+}
+
 function adminSend(){
   const txt = document.getElementById('adminReply').value.trim();
   if(!txt||!currentConvUser) return;
-  TV.sendSupport(currentConvUser, txt, 'admin');
-  notifyEmail(currentConvUser,'Support reply',txt);
+  TV.adminReplySupport(currentConvUser, txt);
+  const u = TV.getUser(currentConvUser);
+  toast(`Reply sent — translated to ${langNames[u?.lang]||'English'} for the user`,'success');
   document.getElementById('adminReply').value='';
-  renderConv(); renderSupport();
-  toast('Reply sent','success');
+  renderConv(); renderSupport(); updateKPIs();
 }
 
+/* ===== DEPOSITS ===== */
+function renderDeposits(){
+  const d=TV.load();
+  document.getElementById('depBody').innerHTML = d.deposits.slice().reverse().map(x=>{
+    const u=TV.getUser(x.userId);
+    const statusTag = `<span class="tag ${x.status==='completed'?'tag-ok':x.status==='pending'?'tag-pend':x.status==='review'?'tag-info':'tag-no'}">${x.status}</span>`;
+    const actions = x.status==='pending' ?
+      `<button class="btn btn-primary btn-sm" onclick="approveDep('${x.id}')">✓ Approve</button>
+       <button class="btn btn-ghost btn-sm" onclick="reviewDepModal('${x.id}')">⏳ Review</button>
+       <button class="btn btn-ghost btn-sm" onclick="rejectDepModal('${x.id}')">✗ Reject</button>` : '—';
+    return `<tr>
+      <td>${u?u.email:x.userId}</td><td>${x.method}</td><td>$${x.amount}</td>
+      <td>${statusTag}</td><td>${new Date(x.ts).toLocaleString()}</td><td>${actions}</td></tr>`;
+  }).join('') || '<tr><td colspan="6" class="muted center" style="padding:18px">No deposits.</td></tr>';
+}
+
+function approveDep(id){
+  TV.approveDeposit(id);
+  const dep=TV.load().deposits.find(x=>x.id===id);
+  if(dep){ const u=TV.getUser(dep.userId); notifyEmail(dep.userId,'Deposit Confirmed',`Dear ${u?.name||'User'},\n\nYour deposit of $${dep.amount} via ${dep.method} has been credited to your account.\n\nThe TradeVerse Team`); }
+  toast('Deposit approved — user credited & notified','success');
+  renderDeposits(); updateKPIs();
+}
+
+function rejectDepModal(id){
+  const dep = TV.load().deposits.find(x=>x.id===id);
+  const u = TV.getUser(dep.userId);
+  const modal = `
+  <div class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-box" style="max-width:520px" onclick="event.stopPropagation()">
+      <h3 class="mb">Reject Deposit — $${dep.amount} (${u?.email||dep.userId})</h3>
+      <div class="reason-box">
+        <label style="font-size:.85rem;font-weight:600">Rejection reason</label>
+        <select class="input" id="depRejectReasonSelect" onchange="document.getElementById('depRejectReason').value=this.value" style="margin-bottom:8px">
+          <option value="">— Quick reasons —</option>
+          <option>Transaction not found on blockchain</option>
+          <option>Funds sent to wrong network</option>
+          <option>Transaction still pending — please wait for confirmation</option>
+          <option>Insufficient transaction fee</option>
+          <option>Amount mismatch — sent amount does not match request</option>
+        </select>
+        <textarea id="depRejectReason" placeholder="Type or select a reason…"></textarea>
+      </div>
+      <div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doRejectDep('${id}')">Reject & Send Email</button></div>
+    </div>
+  </div>`;
+  document.getElementById('modalContainer').innerHTML = modal;
+}
+function doRejectDep(id){
+  const reason = document.getElementById('depRejectReason').value.trim() || 'Transaction could not be verified on the blockchain.';
+  TV.rejectDeposit(id, reason);
+  const dep = TV.load().deposits.find(x=>x.id===id);
+  const u = TV.getUser(dep.userId);
+  const tmpl = TV.load().templates.rejection.find(t=>t.id==='rej1');
+  const body = (tmpl?tmpl.body:'').replace('{name}',u?.name||'User').replace('{reason}',reason);
+  notifyEmail(dep.userId, tmpl?tmpl.subject:'Your Deposit Could Not Be Verified', body);
+  toast('Deposit rejected — email sent with reason','warn');
+  closeModal(); renderDeposits(); updateKPIs();
+}
+
+function reviewDepModal(id){
+  const dep = TV.load().deposits.find(x=>x.id===id);
+  const u = TV.getUser(dep.userId);
+  const modal = `
+  <div class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-box" style="max-width:520px" onclick="event.stopPropagation()">
+      <h3 class="mb">Hold for Review — $${dep.amount} (${u?.email||dep.userId})</h3>
+      <div class="reason-box">
+        <label style="font-size:.85rem;font-weight:600">Review reason</label>
+        <textarea id="depReviewReason" placeholder="e.g. Verifying large deposit amount, additional on-chain confirmation needed…"></textarea>
+      </div>
+      <div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doReviewDep('${id}')">Hold for Review & Notify</button></div>
+    </div>
+  </div>`;
+  document.getElementById('modalContainer').innerHTML = modal;
+}
+function doReviewDep(id){
+  const reason = document.getElementById('depReviewReason').value.trim() || 'Deposit is under additional review as part of our security process.';
+  TV.reviewDeposit(id, reason);
+  const dep = TV.load().deposits.find(x=>x.id===id);
+  const u = TV.getUser(dep.userId);
+  const tmpl = TV.load().templates.review.find(t=>t.id==='rev1');
+  const body = (tmpl?tmpl.body:'').replace('{name}',u?.name||'User').replace('{reason}',reason);
+  notifyEmail(dep.userId, tmpl?tmpl.subject:'Your Deposit Is Being Reviewed', body);
+  toast('Deposit held for review — user notified','info');
+  closeModal(); renderDeposits(); updateKPIs();
+}
+
+/* ===== WITHDRAWALS ===== */
+function renderWithdrawals(){
+  const d=TV.load();
+  document.getElementById('wdBody').innerHTML = d.withdrawals.slice().reverse().map(x=>{
+    const u=TV.getUser(x.userId);
+    const statusTag = `<span class="tag ${x.status==='completed'?'tag-ok':x.status==='pending'?'tag-pend':x.status==='review'?'tag-info':'tag-no'}">${x.status}</span>`;
+    const actions = x.status==='pending' ?
+      `<button class="btn btn-primary btn-sm" onclick="approveWd('${x.id}')">✓ Approve</button>
+       <button class="btn btn-ghost btn-sm" onclick="reviewWdModal('${x.id}')">⏳ Review</button>
+       <button class="btn btn-ghost btn-sm" onclick="rejectWdModal('${x.id}')">✗ Reject</button>` : '—';
+    return `<tr>
+      <td>${u?u.email:x.userId}</td><td>$${x.amount}</td><td style="font-family:monospace;font-size:.78rem">${(x.addr||'').slice(0,18)}…</td>
+      <td>${statusTag}</td><td>${new Date(x.ts).toLocaleString()}</td><td>${actions}</td></tr>`;
+  }).join('') || '<tr><td colspan="6" class="muted center" style="padding:18px">No withdrawals.</td></tr>';
+}
+
+function approveWd(id){
+  TV.approveWithdrawal(id);
+  const wd=TV.load().withdrawals.find(x=>x.id===id);
+  if(wd){ const u=TV.getUser(wd.userId); notifyEmail(wd.userId,'Withdrawal Processed',`Dear ${u?.name||'User'},\n\nYour withdrawal of $${wd.amount} has been processed and sent to your wallet.\n\nThe TradeVerse Team`); }
+  toast('Withdrawal approved — user notified','success');
+  renderWithdrawals(); updateKPIs();
+}
+
+function rejectWdModal(id){
+  const wd = TV.load().withdrawals.find(x=>x.id===id);
+  const u = TV.getUser(wd.userId);
+  const modal = `
+  <div class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-box" style="max-width:520px" onclick="event.stopPropagation()">
+      <h3 class="mb">Reject Withdrawal — $${wd.amount} (${u?.email||wd.userId})</h3>
+      <div class="reason-box">
+        <label style="font-size:.85rem;font-weight:600">Rejection reason</label>
+        <select class="input" id="wdRejectReasonSelect" onchange="document.getElementById('wdRejectReason').value=this.value" style="margin-bottom:8px">
+          <option value="">— Quick reasons —</option>
+          <option>Incorrect wallet address — please verify and resubmit</option>
+          <option>Account verification (KYC) incomplete</option>
+          <option>Unusual account activity detected</option>
+          <option>Withdrawal amount exceeds available balance</option>
+          <option>Additional security verification required</option>
+        </select>
+        <textarea id="wdRejectReason" placeholder="Type or select a reason…"></textarea>
+      </div>
+      <div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doRejectWd('${id}')">Reject & Send Email</button></div>
+    </div>
+  </div>`;
+  document.getElementById('modalContainer').innerHTML = modal;
+}
+function doRejectWd(id){
+  const reason = document.getElementById('wdRejectReason').value.trim() || 'Withdrawal request declined. Please contact support for details.';
+  TV.rejectWithdrawal(id, reason);
+  const wd = TV.load().withdrawals.find(x=>x.id===id);
+  const u = TV.getUser(wd.userId);
+  const tmpl = TV.load().templates.rejection.find(t=>t.id==='rej2');
+  const body = (tmpl?tmpl.body:'').replace('{name}',u?.name||'User').replace('{reason}',reason);
+  notifyEmail(wd.userId, tmpl?tmpl.subject:'Your Withdrawal Request Was Declined', body);
+  toast('Withdrawal rejected — funds returned, email sent','warn');
+  closeModal(); renderWithdrawals(); updateKPIs();
+}
+
+function reviewWdModal(id){
+  const wd = TV.load().withdrawals.find(x=>x.id===id);
+  const u = TV.getUser(wd.userId);
+  const modal = `
+  <div class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-box" style="max-width:520px" onclick="event.stopPropagation()">
+      <h3 class="mb">Hold for Review — $${wd.amount} (${u?.email||wd.userId})</h3>
+      <div class="reason-box">
+        <label style="font-size:.85rem;font-weight:600">Review reason</label>
+        <textarea id="wdReviewReason" placeholder="e.g. Compliance review in progress, verifying withdrawal destination…"></textarea>
+      </div>
+      <div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doReviewWd('${id}')">Hold for Review & Notify</button></div>
+    </div>
+  </div>`;
+  document.getElementById('modalContainer').innerHTML = modal;
+}
+function doReviewWd(id){
+  const reason = document.getElementById('wdReviewReason').value.trim() || 'Withdrawal is under compliance review as part of our security process.';
+  TV.reviewWithdrawal(id, reason);
+  const wd = TV.load().withdrawals.find(x=>x.id===id);
+  const u = TV.getUser(wd.userId);
+  const tmpl = TV.load().templates.review.find(t=>t.id==='rev2');
+  const body = (tmpl?tmpl.body:'').replace('{name}',u?.name||'User').replace('{reason}',reason);
+  notifyEmail(wd.userId, tmpl?tmpl.subject:'Your Withdrawal Is Under Review', body);
+  toast('Withdrawal held for review — user notified','info');
+  closeModal(); renderWithdrawals(); updateKPIs();
+}
+
+/* ===== GENERATE TRANSACTION ===== */
+function renderGenTransaction(){
+  const d=TV.load();
+  const sel = document.getElementById('genUser');
+  if(sel){
+    sel.innerHTML = d.users.map(u=>`<option value="${u.id}">${u.name} — ${u.email}</option>`).join('');
+  }
+  renderGenHistory();
+}
+function doGenerateTransaction(){
+  const userId = document.getElementById('genUser').value;
+  const type = document.getElementById('genType').value;
+  const amount = parseFloat(document.getElementById('genAmount').value);
+  const desc = document.getElementById('genDesc').value;
+  const dateStr = document.getElementById('genDate').value;
+  const assetClass = document.getElementById('genAssetClass').value;
+  if(!userId){ toast('Select a user','error'); return; }
+  if(!amount || isNaN(amount)){ toast('Enter a valid amount','error'); return; }
+  const r = TV.generateTransaction(userId, type, amount, desc, dateStr);
+  if(!r.ok){ toast(r.error||'Failed','error'); return; }
+  const u = TV.getUser(userId);
+  notifyEmail(userId, 'Account Update — New Transaction', `Dear ${u.name},\n\nA ${type} of ${amount>=0?'$':'-$'}${Math.abs(amount).toFixed(2)} has been posted to your account: ${desc||type}.\n\n${dateStr?`Date: ${dateStr}\n`:''}The TradeVerse Team`);
+  toast(`Transaction generated for ${u.name}`,'success');
+  document.getElementById('genDesc').value=''; document.getElementById('genDate').value='';
+  renderGenHistory();
+}
+function renderGenHistory(){
+  const d=TV.load();
+  const gen = (d.transactions||[]).filter(t=>t.generatedBy==='admin').slice(-10).reverse();
+  document.getElementById('genHistory').innerHTML = gen.map(t=>{
+    const u = TV.getUser(t.userId);
+    return `<div class="act-row"><span class="act-time">${new Date(t.ts).toLocaleDateString()}</span><span class="act-text"><span class="tag tag-info">${t.type}</span> $${t.amount} — ${u?.email||t.userId} — ${t.desc}${t.backdated?' 📅 (backdated)':''}</span></div>`;
+  }).join('') || '<p class="muted">No generated transactions yet.</p>';
+}
+
+/* ===== WALLETS ===== */
 function renderWalletsAdmin(){
   const d=TV.load();
   document.getElementById('walletsAdmin').innerHTML = d.wallets.map(w=>`<div class="card" style="margin-bottom:14px">
-    <div class="between mb"><strong>${w.name}</strong><span class="chip">${w.network}</span></div>
+    <div class="between mb"><strong>${w.icon} ${w.name}</strong><div><span class="chip">${w.network}</span> <button class="btn btn-ghost btn-sm" onclick="removeWallet('${w.id}')" style="margin-left:8px">🗑️ Remove</button></div></div>
     <input class="input" id="w_${w.id}" value="${w.address}" style="font-family:monospace;font-size:.82rem">
-    <button class="btn btn-primary btn-sm mt" onclick="saveWallet('${w.id}')">${t('save')}</button>
+    <button class="btn btn-primary btn-sm mt" onclick="saveWallet('${w.id}')">Save Address</button>
   </div>`).join('');
 }
-function saveWallet(id){ const addr=document.getElementById('w_'+id).value.trim(); TV.updateWallet(id,addr); toast('Wallet updated','success'); }
+function saveWallet(id){
+  const addr=document.getElementById('w_'+id).value.trim();
+  TV.updateWallet(id,addr);
+  toast('Wallet updated — users see new address','success');
+}
+function removeWallet(id){
+  if(!confirm('Remove this wallet? Users will no longer see it as a deposit option.')) return;
+  TV.removeWallet(id);
+  toast('Wallet removed','warn');
+  renderWalletsAdmin();
+}
+function showAddWallet(){
+  const modal = `
+  <div class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-box" style="max-width:480px" onclick="event.stopPropagation()">
+      <h3 class="mb">Add New Wallet</h3>
+      <div class="field"><label>Wallet ID (unique, no spaces)</label><input class="input" id="newWalletId" placeholder="e.g. sol"></div>
+      <div class="field"><label>Name</label><input class="input" id="newWalletName" placeholder="e.g. Solana (SOL)"></div>
+      <div class="field"><label>Network</label><input class="input" id="newWalletNetwork" placeholder="e.g. Solana"></div>
+      <div class="field"><label>Address</label><input class="input" id="newWalletAddress" placeholder="Wallet address" style="font-family:monospace"></div>
+      <div class="field"><label>Icon (emoji)</label><input class="input" id="newWalletIcon" placeholder="◎" maxlength="2"></div>
+      <div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doAddWallet()">Add Wallet</button></div>
+    </div>
+  </div>`;
+  document.getElementById('modalContainer').innerHTML = modal;
+}
+function doAddWallet(){
+  const id=document.getElementById('newWalletId').value.trim();
+  const name=document.getElementById('newWalletName').value.trim();
+  const network=document.getElementById('newWalletNetwork').value.trim();
+  const address=document.getElementById('newWalletAddress').value.trim();
+  const icon=document.getElementById('newWalletIcon').value.trim()||'◈';
+  if(!id||!name||!network||!address){ toast('Fill all fields','error'); return; }
+  const r=TV.addWallet(id,name,network,address,icon);
+  if(!r.ok){ toast(r.error,'error'); return; }
+  toast('Wallet added','success');
+  closeModal(); renderWalletsAdmin();
+}
 
-function doBroadcast(){
-  const sub=document.getElementById('bcSub').value.trim(); const body=document.getElementById('bcBody').value.trim();
+/* ===== EMAIL CENTER ===== */
+function renderEmailCenter(){
+  const d=TV.load();
+  const sel = document.getElementById('emailUser');
+  if(sel) sel.innerHTML = d.users.map(u=>`<option value="${u.id}">${u.name} — ${u.email} (${langNames[u.lang]||u.lang})</option>`).join('');
+  document.getElementById('emailUserCount').textContent = d.users.length;
+  // Populate template select with all templates
+  const tmplSel = document.getElementById('emailTemplateSelect');
+  let opts = '<option value="">— Select a template —</option>';
+  const cats = Object.keys(d.templates);
+  cats.forEach(cat=>{
+    opts += `<optgroup label="${cat.charAt(0).toUpperCase()+cat.slice(1)}">`;
+    d.templates[cat].forEach(t=>{ opts += `<option value="${cat}:${t.id}">${t.name}</option>`; });
+    opts += '</optgroup>';
+  });
+  tmplSel.innerHTML = opts;
+  updateEmailPreview();
+}
+function setEmailMode(mode){
+  emailMode = mode;
+  document.querySelectorAll('#av-email .template-tab').forEach(t=>t.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('emailIndividual').style.display = mode==='individual'?'block':'none';
+  document.getElementById('emailMass').style.display = mode==='mass'?'block':'none';
+}
+function applyEmailTemplate(){
+  const val = document.getElementById('emailTemplateSelect').value;
+  if(!val) return;
+  const [cat,id] = val.split(':');
+  const tmpl = TV.load().templates[cat].find(t=>t.id===id);
+  if(tmpl){
+    document.getElementById('emailSubject').value = tmpl.subject;
+    document.getElementById('emailBody').value = tmpl.body;
+    updateEmailPreview();
+  }
+}
+function updateEmailPreview(){
+  const sub = document.getElementById('emailSubject').value || '—';
+  const body = document.getElementById('emailBody').value;
+  const namePreview = emailMode==='individual' ? (TV.getUser(document.getElementById('emailUser')?.value)?.name || '{name}') : '{name}';
+  document.getElementById('previewSubject').textContent = sub;
+  document.getElementById('previewBody').textContent = body.replace(/{name}/g, namePreview).replace(/{refCode}/g,'TVDEMO123').replace(/{refLink}/g,'https://tradeverse.io/signup?ref=TVDEMO123').replace(/{refEarnings}/g,'$0') || 'Start typing to see a preview…';
+}
+function sendEmail(){
+  const sub = document.getElementById('emailSubject').value.trim();
+  const body = document.getElementById('emailBody').value.trim();
   if(!sub||!body){ toast('Fill subject and message','error'); return; }
-  const d=TV.load(); d.users.forEach(u=>notifyEmail(u.id,sub,body));
-  TV.broadcast(sub,body);
+  const d = TV.load();
+  if(emailMode==='individual'){
+    const uid = document.getElementById('emailUser').value;
+    if(!uid){ toast('Select a user','error'); return; }
+    const u = TV.getUser(uid);
+    const personalizedBody = body.replace(/{name}/g, u.name).replace(/{refCode}/g, u.referralCode||'').replace(/{refLink}/g, TV.getReferralLink(uid)).replace(/{refEarnings}/g, '$'+(u.referralEarnings||0));
+    TV.sendIndividualEmail(uid, sub, personalizedBody);
+    toast(`Email sent to ${u.email}`,'success');
+  } else {
+    d.users.forEach(u=>{
+      const personalizedBody = body.replace(/{name}/g, u.name).replace(/{refCode}/g, u.referralCode||'').replace(/{refLink}/g, TV.getReferralLink(u.id)).replace(/{refEarnings}/g, '$'+(u.referralEarnings||0));
+      TV.sendIndividualEmail(u.id, sub, personalizedBody);
+    });
+    toast(`Mass email sent to ${d.users.length} users`,'success');
+  }
+  document.getElementById('emailSubject').value=''; document.getElementById('emailBody').value='';
+  updateEmailPreview();
+}
+
+/* ===== TEMPLATES ===== */
+function renderTemplates(){
+  const d=TV.load();
+  const cats = Object.keys(d.templates);
+  const tabsHtml = cats.map(c=>`<div class="template-tab ${c===currentTemplateCategory?'active':''}" onclick="setTemplateCategory('${c}')">${c.charAt(0).toUpperCase()+c.slice(1)}</div>`).join('');
+  document.getElementById('templateTabs').innerHTML = tabsHtml;
+  const list = d.templates[currentTemplateCategory]||[];
+  document.getElementById('templateList').innerHTML = list.map(t=>`
+    <div class="template-card" onclick="useTemplate('${currentTemplateCategory}','${t.id}')">
+      <h5>${t.name}</h5>
+      <p><strong>Subject:</strong> ${t.subject}</p>
+      <p style="margin-top:6px;white-space:pre-wrap;max-height:100px;overflow:hidden">${t.body.slice(0,200)}…</p>
+    </div>`).join('');
+}
+function setTemplateCategory(cat){
+  currentTemplateCategory = cat;
+  renderTemplates();
+}
+function useTemplate(cat,id){
+  const tmpl = TV.load().templates[cat].find(t=>t.id===id);
+  if(!tmpl) return;
+  // Navigate to email center and apply
+  adminView('email',{preventDefault:()=>{},currentTarget:{classList:{add:()=>{}}}});
+  setTimeout(()=>{
+    const sel = document.getElementById('emailTemplateSelect');
+    sel.value = cat+':'+id;
+    applyEmailTemplate();
+    toast('Template loaded — review and send','success');
+  },100);
+}
+
+/* ===== BANK LINKS ===== */
+function renderBankLinks(){
+  const d=TV.load();
+  const links = d.bankLinks||[];
+  document.getElementById('bankBody').innerHTML = links.slice().reverse().map(bl=>{
+    const u=TV.getUser(bl.userId);
+    const statusTag = `<span class="tag ${bl.status==='approved'?'tag-ok':bl.status==='pending'?'tag-pend':'tag-no'}">${bl.status}</span>`;
+    const actions = bl.status==='pending' ?
+      `<button class="btn btn-primary btn-sm" onclick="approveBank('${bl.id}')">✓ Approve</button>
+       <button class="btn btn-ghost btn-sm" onclick="rejectBankModal('${bl.id}')">✗ Reject</button>` : '—';
+    return `<tr>
+      <td>${u?u.email:bl.userId}</td><td>${bl.bankName}</td><td>****${bl.accountNumber?.slice(-4)||'****'}</td>
+      <td>${statusTag}</td><td>${new Date(bl.ts).toLocaleString()}</td><td>${actions}</td></tr>`;
+  }).join('') || '<tr><td colspan="6" class="muted center" style="padding:18px">No bank link requests.</td></tr>';
+}
+function approveBank(id){
+  TV.approveBankLink(id);
+  const bl=(TV.load().bankLinks||[]).find(x=>x.id===id);
+  if(bl){ const u=TV.getUser(bl.userId); notifyEmail(bl.userId,'Bank Link Approved',`Dear ${u?.name||'User'},\n\nYour bank link to ${bl.bankName} has been approved! You can now deposit and withdraw via bank transfer.\n\nThe TradeVerse Team`); }
+  toast('Bank link approved','success');
+  renderBankLinks(); updateKPIs();
+}
+function rejectBankModal(id){
+  const modal = `
+  <div class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-box" style="max-width:480px" onclick="event.stopPropagation()">
+      <h3 class="mb">Reject Bank Link</h3>
+      <div class="reason-box"><label style="font-size:.85rem;font-weight:600">Reason</label><textarea id="bankRejectReason" placeholder="e.g. Bank account could not be verified…"></textarea></div>
+      <div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doRejectBank('${id}')">Reject & Notify</button></div>
+    </div>
+  </div>`;
+  document.getElementById('modalContainer').innerHTML = modal;
+}
+function doRejectBank(id){
+  const reason = document.getElementById('bankRejectReason').value.trim() || 'Bank account could not be verified.';
+  TV.rejectBankLink(id, reason);
+  const bl=(TV.load().bankLinks||[]).find(x=>x.id===id);
+  if(bl){ const u=TV.getUser(bl.userId); notifyEmail(bl.userId,'Bank Link Rejected',`Dear ${u?.name||'User'},\n\nYour bank link request was declined. Reason: ${reason}\n\nThe TradeVerse Team`); }
+  toast('Bank link rejected','warn');
+  closeModal(); renderBankLinks(); updateKPIs();
+}
+
+/* ===== ACTIVITY MONITOR ===== */
+function renderActivityMonitor(){
+  const d=TV.load();
+  const sel = document.getElementById('actUserSelect');
+  sel.innerHTML = '<option value="">— Select a user —</option>' + d.users.map(u=>`<option value="${u.id}">${u.name} — ${u.email}</option>`).join('');
+  renderUserActivity();
+}
+function renderUserActivity(){
+  const uid = document.getElementById('actUserSelect').value;
+  if(!uid){ document.getElementById('activityMonitor').innerHTML='<p class="muted center" style="padding:24px">Select a user to view their activity.</p>'; return; }
+  const u = TV.getUser(uid);
+  const act = TV.getUserActivity(uid);
+  const logins = u.loginHistory||[];
+  const html = `
+    <div class="dash-grid-2 mb">
+      <div class="card">
+        <h4 class="mb">User Summary</h4>
+        <div class="user-detail-row"><span class="lbl">Name</span><span>${u.name}</span></div>
+        <div class="user-detail-row"><span class="lbl">Email</span><span>${u.email}</span></div>
+        <div class="user-detail-row"><span class="lbl">Last login</span><span>${u.lastLogin?new Date(u.lastLogin).toLocaleString():'Never'}</span></div>
+        <div class="user-detail-row"><span class="lbl">Total logins</span><span>${logins.length}</span></div>
+        <div class="user-detail-row"><span class="lbl">Total activity events</span><span>${act.length}</span></div>
+        <div class="user-detail-row"><span class="lbl">Balance</span><span>$${(u.balance||0).toFixed(2)}</span></div>
+      </div>
+      <div class="card">
+        <h4 class="mb">Login History (${logins.length})</h4>
+        <div style="max-height:200px;overflow-y:auto">
+          ${logins.slice(-10).reverse().map(l=>`<div class="act-row"><span class="act-time">${new Date(l.ts).toLocaleString()}</span><span class="act-text">Login</span></div>`).join('') || '<p class="muted">No logins recorded.</p>'}
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h4 class="mb">Full Activity Log (${act.length} events)</h4>
+      <div style="max-height:400px;overflow-y:auto">
+        ${act.slice().reverse().map(a=>`<div class="act-row"><span class="act-time">${new Date(a.ts).toLocaleString()}</span><span class="act-text"><span class="tag tag-info">${a.action}</span> ${a.detail}</span></div>`).join('') || '<p class="muted">No activity recorded.</p>'}
+      </div>
+    </div>`;
+  document.getElementById('activityMonitor').innerHTML = html;
+}
+
+/* ===== ADMIN ALERTS ===== */
+function renderAlerts(){
+  const d=TV.load();
+  const alerts = d.adminAlerts||[];
+  document.getElementById('alertsList').innerHTML = alerts.map(a=>`
+    <div class="card" style="margin-bottom:10px">
+      <div class="between mb"><strong>🔔 ${a.subject}</strong><span class="muted" style="font-size:.76rem">${new Date(a.ts).toLocaleString()}</span></div>
+      <p class="text-2" style="font-size:.84rem">${a.body}</p>
+      <p class="muted" style="font-size:.74rem;margin-top:6px">To: ${a.to}</p>
+    </div>`).join('') || '<p class="muted center" style="padding:24px">No admin alerts yet. You\'ll receive alerts here when users contact support, make deposits, request withdrawals, submit KYC, or request bank links.</p>';
+}
+function clearAlerts(){
+  const d=TV.load();
+  d.adminAlerts = [];
+  TV.save(d);
+  toast('Alerts cleared','success');
+  renderAlerts(); updateKPIs();
+}
+
+/* ===== BROADCAST ===== */
+function renderBroadcasts(){
+  const d=TV.load();
+  // Populate template select
+  const sel = document.getElementById('bcTemplateSelect');
+  let opts = '<option value="">— Select a template —</option>';
+  ['promotional','referral','motivational'].forEach(cat=>{
+    opts += `<optgroup label="${cat.charAt(0).toUpperCase()+cat.slice(1)}">`;
+    (d.templates[cat]||[]).forEach(t=>{ opts += `<option value="${cat}:${t.id}">${t.name}</option>`; });
+    opts += '</optgroup>';
+  });
+  sel.innerHTML = opts;
+
+  document.getElementById('bcList').innerHTML=d.broadcasts.slice().reverse().map(b=>`<div class="watch-item"><div><strong>${b.subject}</strong><div class="muted" style="font-size:.78rem">${b.body}</div></div><span class="muted" style="font-size:.72rem">${new Date(b.ts).toLocaleString()}</span></div>`).join('')||'<p class="muted">None yet.</p>';
+}
+function applyBcTemplate(){
+  const val = document.getElementById('bcTemplateSelect').value;
+  if(!val) return;
+  const [cat,id] = val.split(':');
+  const tmpl = TV.load().templates[cat].find(t=>t.id===id);
+  if(tmpl){ document.getElementById('bcSub').value=tmpl.subject; document.getElementById('bcBody').value=tmpl.body; }
+}
+function doBroadcast(){
+  const sub=document.getElementById('bcSub').value.trim();
+  const body=document.getElementById('bcBody').value.trim();
+  if(!sub||!body){ toast('Fill subject and message','error'); return; }
+  const d=TV.load();
+  d.users.forEach(u=>{
+    const personalized = body.replace(/{name}/g, u.name).replace(/{refCode}/g, u.referralCode||'').replace(/{refLink}/g, TV.getReferralLink(u.id)).replace(/{refEarnings}/g, '$'+(u.referralEarnings||0));
+    u.notifications.push({id:'n'+Date.now()+Math.random(), text:`${sub}: ${personalized}`, ts:Date.now(), read:false, broadcast:true, email:true});
+    notifyEmail(u.id, sub, personalized);
+  });
+  d.broadcasts.push({subject:sub, body, ts:Date.now()});
+  d.activity.push({ts:Date.now(),type:'broadcast',text:`Broadcast: ${sub}`});
+  TV.adminAlert('Broadcast Sent', `Broadcast "${sub}" sent to all ${d.users.length} users.`);
+  TV.save(d);
   toast('Broadcast sent to all users','success');
   document.getElementById('bcSub').value=''; document.getElementById('bcBody').value='';
-  renderBroadcasts(); renderOverview();
+  renderBroadcasts(); updateKPIs();
 }
-function renderBroadcasts(){ const d=TV.load(); document.getElementById('bcList').innerHTML=d.broadcasts.slice().reverse().map(b=>`<div class="watch-item"><div><strong>${b.subject}</strong><div class="muted" style="font-size:.78rem">${b.body}</div></div><span class="muted" style="font-size:.72rem">${new Date(b.ts).toLocaleString()}</span></div>`).join('')||'<p class="muted">None yet.</p>'; }
-function renderActivity(){ const d=TV.load(); document.getElementById('actList').innerHTML=d.activity.slice().reverse().map(a=>`<div class="watch-item"><span class="text-2" style="font-size:.85rem"><span class="tag tag-info">${a.type}</span> ${a.text}</span><span class="muted" style="font-size:.75rem">${new Date(a.ts).toLocaleString()}</span></div>`).join('')||'<p class="muted center" style="padding:18px">No activity.</p>'; }
+
+/* ===== Copy Trading Monitor ===== */
+function renderAdminCopyTraders(){
+  const d=TV.load();
+  const traders=d.copyTraders||[];
+  const relations=d.copyRelations||[];
+  const activeCopiers=relations.length;
+  const aum=relations.reduce((s,r)=>s+(r.allocAmount||0),0);
+  const avgRoi=traders.length? (traders.reduce((s,t)=>s+(t.roi90d||0),0)/traders.length).toFixed(1):0;
+  document.getElementById('ctTotalTraders').textContent=traders.length;
+  document.getElementById('ctActiveCopiers').textContent=activeCopiers;
+  document.getElementById('ctAum').textContent='$'+aum.toLocaleString();
+  document.getElementById('ctAvgRoi').textContent=avgRoi+'%';
+  const tbl=`<table class="data-table" style="width:100%"><thead><tr><th>Trader</th><th>Country</th><th>ROI (90d)</th><th>Win Rate</th><th>Followers</th><th>Copiers</th><th>Risk</th><th>Status</th></tr></thead><tbody>
+    ${traders.map(t=>{
+      const fol=relations.filter(r=>r.traderId===t.id).length;
+      const riskBadge=t.riskScore==='Low'?'badge-up':(t.riskScore==='Medium'?'badge-warn':'badge-down');
+      return `<tr><td><span class="sym"><span class="coin">${(t.name||'??').slice(0,2).toUpperCase()}</span>${t.name}</span></td><td>${t.country||'—'}</td><td class="badge-up">${(t.roi90d||0).toFixed(1)}%</td><td>${(t.winRate||0).toFixed(1)}%</td><td>${(t.followers||0).toLocaleString()}</td><td>${t.copiers||0}</td><td><span class="${riskBadge}">${t.riskScore||'—'}</span></td><td><span class="badge-up">● Active</span></td></tr>`;
+    }).join('')}
+  </tbody></table>`;
+  document.getElementById('ctTradersTable').innerHTML=tbl;
+}
+
+/* ===== Competition Management ===== */
+function renderAdminCompetitions(){
+  const d=TV.load();
+  const comps=d.competitions||[];
+  const entries=d.competitionEntries||[];
+  const active=comps.filter(c=>c.status==='active').length;
+  const totalParts=entries.length;
+  const totalPrize=comps.reduce((s,c)=>s+(c.prizePool||0),0);
+  document.getElementById('compActive').textContent=active;
+  document.getElementById('compParticipants').textContent=totalParts;
+  document.getElementById('compTotalPrize').textContent='$'+totalPrize.toLocaleString();
+  const tbl=`<table class="data-table" style="width:100%"><thead><tr><th>Title</th><th>Type</th><th>Prize Pool</th><th>Participants</th><th>Start</th><th>End</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+    ${comps.map(c=>{
+      const parts=entries.filter(e=>e.compId===c.id).length;
+      const statBadge=c.status==='active'?'badge-up':(c.status==='upcoming'?'badge-warn':'badge-down');
+      const endBtn=c.status==='active'?`<button class="btn btn-sm" style="background:var(--pink);color:#fff" onclick="adminEndComp('${c.id}')">End & Distribute</button>`:'—';
+      const startStr=c.startTs?new Date(c.startTs).toLocaleDateString():'—';
+      const endStr=c.endTs?new Date(c.endTs).toLocaleDateString():'—';
+      return `<tr><td>${c.title}</td><td>${(c.assetClass||c.type||'trading').toUpperCase()}</td><td>$${(c.prizePool||0).toLocaleString()}</td><td>${parts}</td><td style="font-size:.78rem">${startStr}</td><td style="font-size:.78rem">${endStr}</td><td><span class="${statBadge}">${c.status}</span></td><td>${endBtn}</td></tr>`;
+    }).join('')}
+  </tbody></table>`;
+  document.getElementById('compTable').innerHTML=tbl||'<p class="muted center" style="padding:18px">No competitions yet.</p>';
+}
+
+function adminCreateComp(){
+  const title=document.getElementById('compTitle').value.trim();
+  const prize=parseFloat(document.getElementById('compPrize').value)||0;
+  const type=document.getElementById('compType').value;
+  const days=parseInt(document.getElementById('compDays').value)||30;
+  if(!title||prize<=0){ toast('Title and prize pool required','error'); return; }
+  TV.createCompetition(title,'Admin-created competition',prize,0,type,days);
+  toast('Competition created!','ok');
+  document.getElementById('compTitle').value=''; document.getElementById('compPrize').value=''; document.getElementById('compDays').value='';
+  renderAdminCompetitions();
+  updateKPIs();
+}
+
+function adminEndComp(compId){
+  TV.endCompetition(compId);
+  toast('Competition ended, prizes distributed to winners!','ok');
+  renderAdminCompetitions();
+}
+
+/* ===== Staking Pool Management ===== */
+function renderAdminStaking(){
+  const d=TV.load();
+  const pools=d.stakingPools||[];
+  const stakes=d.stakes||[];
+  const active=pools.filter(p=>p.active!==false).length;
+  const tvl=stakes.reduce((s,st)=>s+(st.amount||0),0);
+  const stakers=new Set(stakes.map(st=>st.userId)).size;
+  const avgApy=pools.length?(pools.reduce((s,p)=>s+(p.apy||0),0)/pools.length).toFixed(1):0;
+  document.getElementById('spActive').textContent=active;
+  document.getElementById('spTvl').textContent='$'+tvl.toLocaleString();
+  document.getElementById('spStakers').textContent=stakers;
+  document.getElementById('spAvgApy').textContent=avgApy+'%';
+  const tbl=`<table class="data-table" style="width:100%"><thead><tr><th>Asset</th><th>Symbol</th><th>APY</th><th>Lock Period</th><th>Min Stake</th><th>Total Staked</th><th>Stakers</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+    ${pools.map(p=>{
+      const pStakes=stakes.filter(st=>st.poolId===p.id);
+      const pTvl=pStakes.reduce((s,st)=>s+(st.amount||0),0);
+      const pStakers=new Set(pStakes.map(st=>st.userId)).size;
+      const isActive=p.active!==false;
+      const lockStr=(p.lockDays||0)>0?(p.lockDays+' days'):'Flexible';
+      return `<tr><td>${p.asset||p.name}</td><td><span class="sym"><span class="coin">${(p.symbol||'??').slice(0,3)}</span>${p.symbol}</span></td><td class="badge-up">${p.apy}%</td><td>${lockStr}</td><td>${(p.minStake||0).toLocaleString()}</td><td>${(p.totalStaked||0).toLocaleString()}</td><td>${pStakers}</td><td>${isActive?'<span class="badge-up">● Active</span>':'<span class="badge-down">● Paused</span>'}</td><td><button class="btn btn-sm" onclick="adminTogglePool('${p.id}')">${isActive?'Pause':'Activate'}</button></td></tr>`;
+    }).join('')}
+  </tbody></table>`;
+  document.getElementById('spTable').innerHTML=tbl||'<p class="muted center" style="padding:18px">No staking pools yet.</p>';
+}
+
+function adminCreatePool(){
+  const name=document.getElementById('stakeAsset').value.trim();
+  const sym=document.getElementById('stakeSym').value.trim().toUpperCase();
+  const apy=parseFloat(document.getElementById('stakeApy').value)||0;
+  const lock=parseInt(document.getElementById('stakeLock').value)||0;
+  const min=parseFloat(document.getElementById('stakeMin').value)||0;
+  if(!name||!sym||apy<=0){ toast('Asset name, symbol, and APY are required','error'); return; }
+  const d=TV.load();
+  const pool={ id:'pool_'+Date.now(), asset:name, name:name, symbol:sym, apy, lockDays:lock, minStake:min, totalStaked:0, active:true, icon:'●', color:'#627eea' };
+  d.stakingPools.push(pool);
+  TV.save(d);
+  toast('Staking pool created!','ok');
+  document.getElementById('stakeAsset').value=''; document.getElementById('stakeSym').value=''; document.getElementById('stakeApy').value=''; document.getElementById('stakeLock').value=''; document.getElementById('stakeMin').value='';
+  renderAdminStaking();
+}
+
+function adminTogglePool(poolId){
+  const d=TV.load();
+  const pool=d.stakingPools.find(p=>p.id===poolId);
+  if(pool){ pool.active=pool.active===false?true:false; TV.save(d); toast(pool.active?'Pool activated':'Pool paused','ok'); renderAdminStaking(); }
+}
+
+/* ===== AI ===== */
 function renderAI(){
   const d=TV.load();
   document.getElementById('aiEsc').textContent=d.aiLogs.filter(l=>l.text.includes('escalation')).length;
@@ -266,9 +1356,14 @@ function renderAI(){
   document.getElementById('aiLog').innerHTML=d.aiLogs.slice().reverse().map(l=>`<div class="watch-item"><span class="text-2" style="font-size:.85rem">🤖 ${l.text}</span><span class="muted" style="font-size:.75rem">${new Date(l.ts).toLocaleTimeString()}</span></div>`).join('')||'<p class="muted center" style="padding:18px">No AI events yet. Events appear when users request human help.</p>';
 }
 
+// Live email preview listeners
+document.addEventListener('input', e=>{
+  if(e.target && (e.target.id==='emailSubject'||e.target.id==='emailBody'||e.target.id==='emailUser')) updateEmailPreview();
+});
+
 initTheme(); updateThemeToggle(); applyI18n();
 if(TV.adminSession()) enterAdmin();
-setInterval(()=>{ if(TV.adminSession()) updateKPIs(); }, 4000);
+setInterval(()=>{ if(TV.adminSession()) updateKPIs(); }, 5000);
 </script>
 </body>
 </html>

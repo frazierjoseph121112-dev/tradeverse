@@ -154,6 +154,7 @@ h1, h2, h3, h4 { line-height: 1.2; font-weight: 800; letter-spacing: -0.02em; }
 }
 .badge-up { color: var(--up); }
 .badge-down { color: var(--down); }
+.badge-warn { color: #e8a317; }
 .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 .dot-up { background: var(--up); }
 .dot-down { background: var(--down); }

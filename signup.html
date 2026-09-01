@@ -6,30 +6,278 @@
 <title>Sign up — TradeVerse</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/theme.css">
+<style>
+  .step-indicator{display:flex;gap:4px;margin-bottom:20px}
+  .step-indicator .step{flex:1;height:4px;border-radius:2px;background:var(--border-2);transition:background .3s}
+  .step-indicator .step.active{background:var(--accent)}
+  .step-indicator .step.done{background:var(--accent)}
+  .step-label{font-size:.78rem;color:var(--text-dim);margin-bottom:16px;font-weight:600}
+  .id-req-box{background:var(--chip);border:1px solid var(--border-2);border-radius:10px;padding:14px;margin-top:8px}
+  .id-req-box h4{font-size:.88rem;margin-bottom:8px}
+  .id-req-box ul{margin:0;padding-left:18px;font-size:.82rem;color:var(--text-2)}
+  .upload-area{border:2px dashed var(--border-2);border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:border .3s,background .3s}
+  .upload-area:hover{border-color:var(--accent);background:var(--chip)}
+  .upload-area.has-file{border-color:var(--accent);border-style:solid}
+  .upload-area .upload-icon{font-size:2rem;margin-bottom:8px}
+  .upload-area .upload-text{font-size:.85rem;color:var(--text-2)}
+  .upload-area .file-name{font-size:.82rem;color:var(--accent);font-weight:600;margin-top:6px}
+  .kyc-form{max-width:620px;margin:0 auto}
+  .kyc-form .field{margin-bottom:14px}
+  .kyc-form label{font-size:.85rem;font-weight:600;display:block;margin-bottom:5px}
+  .kyc-form .hint{font-size:.76rem;color:var(--text-dim);margin-top:4px}
+  .optional-tag{font-size:.7rem;color:var(--accent);font-weight:700;margin-left:6px}
+  .crypto-note{background:linear-gradient(135deg,rgba(255,107,157,.1),rgba(0,184,212,.1));border:1px solid var(--accent);border-radius:12px;padding:16px;margin:16px 0}
+  .crypto-note h4{font-size:.92rem;margin-bottom:6px}
+  .crypto-note p{font-size:.82rem;color:var(--text-2);margin:0}
+  .nav-btns{display:flex;gap:10px;margin-top:20px}
+  .lang-pick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+  .lang-pick{padding:12px;border:1px solid var(--border-2);border-radius:10px;cursor:pointer;text-align:center;transition:all .2s;font-weight:600;font-size:.88rem}
+  .lang-pick:hover{border-color:var(--accent)}
+  .lang-pick.selected{border-color:var(--accent);background:var(--chip);color:var(--accent)}
+  .form-section-title{font-size:1rem;font-weight:800;margin:20px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border-2)}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:600px){.two-col{grid-template-columns:1fr}.lang-pick-grid{grid-template-columns:1fr}}
+  .checkbox-row{display:flex;align-items:flex-start;gap:10px;margin:12px 0}
+  .checkbox-row input{margin-top:3px}
+  .checkbox-row label{font-size:.82rem;font-weight:400;cursor:pointer}
+</style>
 <script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
 </head>
 <body>
 <div id="nav"></div>
-<div class="auth-wrap">
-  <div class="card auth-card card-grad fade-up">
+<div class="auth-wrap" style="padding-top:20px;padding-bottom:40px">
+  <div class="card auth-card card-grad fade-up kyc-form">
     <div class="brand mb"><span class="brand-mark">T</span>TradeVerse</div>
-    <h2 class="h3 mb" data-i18n="signup_btn">Create account</h2>
-    <div class="chip mb" style="background:var(--accent-grad-soft);border-color:var(--accent);color:var(--accent)">🎁 <span data-i18n="signup_bonus">Sign up bonus</span>: <strong>$130</strong></div>
-    <div class="pink-chip mb" id="refBanner" style="display:none">🤝 <span data-i18n="ref_earn">Earn $50</span> <span data-i18n="ref_per_referral">per referral</span></div>
-    <form id="signupForm" onsubmit="return doSignup(event)">
-      <div class="field"><label data-i18n="login_email">Email</label><input class="input" type="email" id="su_name" placeholder="you@email.com" required></div>
-      <div class="field"><label>Full name</label><input class="input" type="text" id="su_fullname" placeholder="John Doe" required></div>
-      <div class="field"><label data-i18n="login_pass">Password</label><input class="input" type="password" id="su_pass" placeholder="Min 6 characters" required></div>
-      <div class="field"><label>Country</label>
-        <select class="input" id="su_country" required>
-          <option>United States</option><option>United Kingdom</option><option>United Arab Emirates</option><option>Germany</option><option>France</option><option>Spain</option><option>Portugal</option><option>Poland</option><option>Saudi Arabia</option><option>China</option><option>Japan</option><option>Singapore</option><option>Australia</option><option>Canada</option><option>Brazil</option><option>South Africa</option><option>India</option><option>Nigeria</option><option>Other</option>
+
+    <!-- Step indicator -->
+    <div class="step-indicator">
+      <div class="step active" id="st1"></div>
+      <div class="step" id="st2"></div>
+      <div class="step" id="st3"></div>
+      <div class="step" id="st4"></div>
+      <div class="step" id="st5"></div>
+    </div>
+
+    <!-- ===== STEP 1: Account & Language ===== -->
+    <div id="step1">
+      <div class="step-label">Step 1 of 5 — Account & Language</div>
+      <h2 class="h3 mb">Create your account</h2>
+      <div class="chip mb" style="background:var(--accent-grad-soft);border-color:var(--accent);color:var(--accent)">🎁 Sign up bonus: <strong>$130</strong></div>
+      <div class="pink-chip mb" id="refBanner" style="display:none">🤝 Earn $50 per referral</div>
+
+      <div class="form-section-title">Choose Your Language</div>
+      <p class="hint mb">Select your preferred language. You can change this anytime in Settings.</p>
+      <div class="lang-pick-grid" id="langPicks"></div>
+
+      <div class="form-section-title">Account Details</div>
+      <div class="field"><label>Full legal name</label><input class="input" type="text" id="su_fullname" placeholder="John Doe" required></div>
+      <div class="field"><label>Email address</label><input class="input" type="email" id="su_name" placeholder="you@email.com" required></div>
+      <div class="field"><label>Password</label><input class="input" type="password" id="su_pass" placeholder="Min 6 characters" required></div>
+      <div class="field"><label>Referral code (optional)</label><input class="input" type="text" id="su_ref" placeholder="e.g. TVABC123"></div>
+
+      <div class="nav-btns">
+        <button class="btn btn-primary btn-block btn-lg" onclick="goStep(2)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- ===== STEP 2: Personal & Identity ===== -->
+    <div id="step2" style="display:none">
+      <div class="step-label">Step 2 of 5 — Personal Information & Identity</div>
+      <h2 class="h3 mb">Tell us about yourself</h2>
+
+      <div class="form-section-title">Legal Information</div>
+      <div class="two-col">
+        <div class="field"><label>Legal first name</label><input class="input" type="text" id="kyc_firstName" placeholder="John"></div>
+        <div class="field"><label>Legal last name</label><input class="input" type="text" id="kyc_lastName" placeholder="Doe"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>Date of birth</label><input class="input" type="date" id="kyc_dob"></div>
+        <div class="field"><label>Phone number</label><input class="input" type="tel" id="kyc_phone" placeholder="+1 234 567 8900"></div>
+      </div>
+      <div class="field"><label>Country of residence</label>
+        <select class="input" id="su_country" onchange="updateIDRequirements()" required>
+          <option value="">Select your country</option>
+          <option>United States</option><option>United Kingdom</option><option>United Arab Emirates</option>
+          <option>Germany</option><option>France</option><option>Spain</option><option>Portugal</option>
+          <option>Poland</option><option>Saudi Arabia</option><option>China</option><option>Japan</option>
+          <option>Singapore</option><option>Australia</option><option>Canada</option><option>Brazil</option>
+          <option>South Africa</option><option>India</option><option>Nigeria</option><option>Italy</option>
+          <option>Netherlands</option><option>Sweden</option><option>Mexico</option><option>Turkey</option>
+          <option>Egypt</option><option>Kenya</option><option>Ghana</option><option>Other</option>
         </select>
       </div>
-      <div class="field"><label>Referral code (optional)</label><input class="input" type="text" id="su_ref" placeholder="e.g. friend123"></div>
-      <button class="btn btn-primary btn-block btn-lg" type="submit" data-i18n="signup_btn">Create account</button>
-    </form>
-    <p class="center text-2 mt" style="font-size:.88rem">Already have an account? <a href="login.html" class="accent" style="font-weight:700" data-i18n="nav_login">Log in</a></p>
-    <p class="muted mt" style="font-size:.74rem;line-height:1.5" data-i18n="risk">Capital at risk. Investments can go down as well as up and you may get back less than you invested.</p>
+      <div class="field"><label>Residential address</label><input class="input" type="text" id="kyc_address" placeholder="123 Main Street, Apt 4B"></div>
+      <div class="two-col">
+        <div class="field"><label>City</label><input class="input" type="text" id="kyc_city" placeholder="New York"></div>
+        <div class="field"><label>Postal / ZIP code</label><input class="input" type="text" id="kyc_zip" placeholder="10001"></div>
+      </div>
+
+      <div class="form-section-title">Government ID Verification</div>
+      <div class="id-req-box" id="idReqBox">
+        <h4>📋 Select your country first to see accepted ID types</h4>
+        <ul id="idReqList"><li>Requirements will appear based on your country</li></ul>
+      </div>
+      <div class="field mt">
+        <label>ID Type</label>
+        <select class="input" id="kyc_idType" onchange="updateIDTypeField()">
+          <option value="">Select ID type</option>
+        </select>
+      </div>
+      <div class="upload-area" id="idUploadArea" onclick="document.getElementById('kyc_idFile').click()">
+        <div class="upload-icon">📎</div>
+        <div class="upload-text">Click to upload your government ID<br><span style="font-size:.74rem">(JPG, PNG, PDF — max 10MB)</span></div>
+        <div class="file-name" id="idFileName" style="display:none"></div>
+      </div>
+      <input type="file" id="kyc_idFile" accept="image/*,.pdf" style="display:none" onchange="handleFileUpload('id')">
+
+      <div class="form-section-title mt">Proof of Address (optional but recommended)</div>
+      <div class="upload-area" id="addrUploadArea" onclick="document.getElementById('kyc_addrFile').click()">
+        <div class="upload-icon">📄</div>
+        <div class="upload-text">Upload a utility bill or bank statement<br><span style="font-size:.74rem">(Must show your name and address)</span></div>
+        <div class="file-name" id="addrFileName" style="display:none"></div>
+      </div>
+      <input type="file" id="kyc_addrFile" accept="image/*,.pdf" style="display:none" onchange="handleFileUpload('addr')">
+
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
+        <button class="btn btn-primary btn-block btn-lg" onclick="goStep(3)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- ===== STEP 3: Financial & Employment ===== -->
+    <div id="step3" style="display:none">
+      <div class="step-label">Step 3 of 5 — Financial & Employment Background</div>
+      <h2 class="h3 mb">Financial profile</h2>
+      <p class="hint mb">This helps us match you with suitable investment options and assess your risk profile. All information is confidential.</p>
+
+      <div class="form-section-title">Employment</div>
+      <div class="field"><label>Employment status</label>
+        <select class="input" id="kyc_employment">
+          <option value="">Select employment status</option>
+          <option>Employed full-time</option><option>Employed part-time</option>
+          <option>Self-employed</option><option>Business owner</option>
+          <option>Retired</option><option>Student</option>
+          <option>Unemployed</option><option>Other</option>
+        </select>
+      </div>
+      <div class="field"><label>Annual income (USD)</label>
+        <select class="input" id="kyc_income">
+          <option value="">Select income range</option>
+          <option>Under $25,000</option><option>$25,000 – $50,000</option>
+          <option>$50,000 – $100,000</option><option>$100,000 – $250,000</option>
+          <option>$250,000 – $500,000</option><option>Over $500,000</option>
+        </select>
+      </div>
+      <div class="field"><label>Estimated net worth (USD)</label>
+        <select class="input" id="kyc_netWorth">
+          <option value="">Select net worth range</option>
+          <option>Under $50,000</option><option>$50,000 – $100,000</option>
+          <option>$100,000 – $500,000</option><option>$500,000 – $1,000,000</option>
+          <option>$1,000,000 – $5,000,000</option><option>Over $5,000,000</option>
+        </select>
+      </div>
+
+      <div class="form-section-title">Investment Experience</div>
+      <div class="field"><label>Investment experience level</label>
+        <select class="input" id="kyc_expLevel">
+          <option value="">Select your experience</option>
+          <option>Beginner — New to investing</option>
+          <option>Intermediate — Some experience</option>
+          <option>Advanced — Experienced trader</option>
+          <option>Professional — Full-time trader</option>
+        </select>
+      </div>
+      <div class="field"><label>Investment objectives</label>
+        <select class="input" id="kyc_objectives">
+          <option value="">Select your primary goal</option>
+          <option>Capital preservation — Low risk</option>
+          <option>Income — Dividends & interest</option>
+          <option>Growth — Long-term appreciation</option>
+          <option>Speculation — High risk / high reward</option>
+          <option>Hedging — Risk management</option>
+        </select>
+      </div>
+      <div class="field"><label>Risk tolerance</label>
+        <select class="input" id="kyc_riskTolerance">
+          <option value="">Select risk tolerance</option>
+          <option>Conservative — Minimize risk</option>
+          <option>Moderate — Balanced approach</option>
+          <option>Aggressive — High risk tolerance</option>
+        </select>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
+        <button class="btn btn-primary btn-block btn-lg" onclick="goStep(4)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- ===== STEP 4: Funding ===== -->
+    <div id="step4" style="display:none">
+      <div class="step-label">Step 4 of 5 — Funding Details</div>
+      <h2 class="h3 mb">How would you like to fund your account?</h2>
+
+      <div class="crypto-note">
+        <h4>🪙 Prefer crypto? Gas fees are on us!</h4>
+        <p>You can deposit and withdraw using cryptocurrency (BTC, ETH, USDT, LTC) with zero gas fees. No bank account needed — just pick "Crypto only" below.</p>
+      </div>
+
+      <div class="field">
+        <label>Funding method preference</label>
+        <div class="checkbox-row" style="border:1px solid var(--border-2);border-radius:10px;padding:14px">
+          <input type="radio" name="fundingMethod" id="fundCrypto" value="crypto" checked onchange="toggleFundingSection()">
+          <label for="fundCrypto"><strong>Cryptocurrency only</strong> — Deposit & withdraw with crypto. Gas fees covered by us. No bank account needed.</label>
+        </div>
+        <div class="checkbox-row" style="border:1px solid var(--border-2);border-radius:10px;padding:14px;margin-top:8px">
+          <input type="radio" name="fundingMethod" id="fundBank" value="bank" onchange="toggleFundingSection()">
+          <label for="fundBank"><strong>Link bank account (optional)</strong> — Deposit & withdraw via bank transfer (ACH/wire). Subject to verification.</label>
+        </div>
+      </div>
+
+      <div id="bankSection" style="display:none">
+        <div class="form-section-title">Bank Account Details</div>
+        <p class="hint">Linking a bank account is optional. You can always add this later in your dashboard settings.</p>
+        <div class="field"><label>Bank name</label><input class="input" type="text" id="kyc_bankName" placeholder="e.g. Chase Bank"></div>
+        <div class="two-col">
+          <div class="field"><label>Account number</label><input class="input" type="text" id="kyc_acctNum" placeholder="Account number"></div>
+          <div class="field"><label>Routing number</label><input class="input" type="text" id="kyc_routingNum" placeholder="Routing number"></div>
+        </div>
+        <div class="upload-area" id="bankUploadArea" onclick="document.getElementById('kyc_bankFile').click()">
+          <div class="upload-icon">🏦</div>
+          <div class="upload-text">Upload bank statement (optional)<br><span style="font-size:.74rem">Speeds up verification</span></div>
+          <div class="file-name" id="bankFileName" style="display:none"></div>
+        </div>
+        <input type="file" id="kyc_bankFile" accept="image/*,.pdf" style="display:none" onchange="handleFileUpload('bank')">
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="goStep(3)">← Back</button>
+        <button class="btn btn-primary btn-block btn-lg" onclick="goStep(5)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- ===== STEP 5: Review & Submit ===== -->
+    <div id="step5" style="display:none">
+      <div class="step-label">Step 5 of 5 — Review & Submit</div>
+      <h2 class="h3 mb">Review your information</h2>
+      <p class="hint mb">Please review your details below. Once submitted, our team will verify your account before approval.</p>
+      <div id="reviewSummary" style="font-size:.84rem"></div>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="agreeTerms" required>
+        <label for="agreeTerms">I confirm that all information provided is accurate. I agree to the <a href="#" class="accent">Terms of Service</a> and <a href="#" class="accent">Privacy Policy</a>. I understand trading involves risk and I may lose some or all of my invested capital.</label>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="agreeKYC" required>
+        <label for="agreeKYC">I consent to identity verification (KYC) and understand my account will be reviewed before full activation.</label>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="goStep(4)">← Back</button>
+        <button class="btn btn-primary btn-block btn-lg" onclick="doSignup()">Submit Application →</button>
+      </div>
+      <p class="muted mt" style="font-size:.74rem;line-height:1.5">Capital at risk. Investments can go down as well as up and you may get back less than you invested.</p>
+    </div>
   </div>
 </div>
 <script src="js/i18n.js"></script>
@@ -37,9 +285,195 @@
 <script src="js/market.js"></script>
 <script src="js/components.js"></script>
 <script>
+let currentStep = 1;
+let selectedLang = 'en';
+let uploadedFiles = { id: null, addr: null, bank: null };
+
+// Country-specific ID requirements
+const countryIDRequirements = {
+  'United States': { types: ['Driver License', 'State ID', 'US Passport'], docs: ['SSN last 4 digits may be required', 'Valid US government-issued photo ID', 'Proof of address (utility bill or bank statement)'] },
+  'United Kingdom': { types: ['UK Passport', 'Driving Licence (photocard)', 'Biometric Residence Permit'], docs: ['Valid UK government-issued photo ID', 'Proof of address within last 3 months'] },
+  'Germany': { types: ['Personalausweis (National ID)', 'Reisepass (Passport)', 'Aufenthaltstitel (Residence Permit)'], docs: ['Gültiger Personalausweis oder Reisepass', 'Meldebescheinigung als Wohnsitzbestätigung'] },
+  'France': { types: ['Carte Nationale d\'Identité', 'Passeport', 'Titre de Séjour'], docs: ['Pièce d\'identité française valide', 'Justificatif de domicile de moins de 3 mois'] },
+  'Spain': { types: ['DNI (Documento Nacional de Identidad)', 'Pasaporte', 'NIE (Foreigner ID)'], docs: ['DNI o pasaporte español válido', 'Empadronamiento como comprobante de domicilio'] },
+  'United Arab Emirates': { types: ['Emirates ID', 'Passport', 'Residence Visa'], docs: ['Valid Emirates ID card', 'Passport with UAE residence visa page'] },
+  'Saudi Arabia': { types: ['Saudi National ID (Hawiya)', 'Iqama (Residence Permit)', 'Passport'], docs: ['Valid Saudi ID or Iqama', 'Proof of address'] },
+  'Canada': { types: ['Canadian Driver License', 'Provincial ID', 'Canadian Passport', 'PR Card'], docs: ['Valid Canadian government-issued photo ID', 'Proof of address'] },
+  'Australia': { types: ['Australian Driver License', 'Passport', 'Medicare Card + License'], docs: ['Valid Australian photo ID', 'Proof of address'] },
+  'India': { types: ['Aadhaar Card', 'PAN Card', 'Indian Passport', 'Voter ID'], docs: ['Aadhaar or PAN card required', 'Address proof (Aadhaar, utility bill)'] },
+  'Nigeria': { types: ['NIN (National Identity Number)', 'Nigerian Passport', 'Driver License', 'Voter Card'], docs: ['NIN slip or card', 'Valid Nigerian government-issued ID'] },
+  'Brazil': { types: ['CPF + RG', 'CNH (Driver License)', 'Brazilian Passport'], docs: ['CPF number required', 'Valid Brazilian photo ID'] },
+  'China': { types: ['身份证 (National ID)', '护照 (Passport)'], docs: ['有效身份证', '地址证明'] },
+  'Japan': { types: ['運転免許証 (Driver License)', 'マイナンバーカード (My Number Card)', 'Passport'], docs: ['有効な写真付き身分証明書', '住民票または住所証明'] },
+  'South Africa': { types: ['South African ID Card', 'Smart ID', 'Passport'], docs: ['Valid South African ID', 'Proof of address'] },
+  'Poland': { types: ['Dowód osobisty (National ID)', 'Paszport (Passport)', 'Karta pobytu (Residence Card)'], docs: ['Ważny dowód osobisty lub paszport', 'Potwierdzenie adresu zamieszkania'] },
+  'Portugal': { types: ['Bilhete de Identidade / Cartão de Cidadão', 'Passaporte', 'Título de Residência'], docs: ['Cartão de cidadão ou passaporte válido', 'Comprovativo de morada'] },
+  'Other': { types: ['Passport', 'National ID Card', 'Driver License'], docs: ['Valid government-issued photo ID', 'Proof of address (utility bill or bank statement)'] }
+};
+
+function buildLangPicks(){
+  const container = document.getElementById('langPicks');
+  container.innerHTML = Object.entries(I18N).map(([code,d])=>
+    `<div class="lang-pick ${code===selectedLang?'selected':''}" onclick="selectLang('${code}')">${d._flag} ${d._name}</div>`
+  ).join('');
+}
+function selectLang(code){
+  selectedLang = code;
+  buildLangPicks();
+}
+
+function updateIDRequirements(){
+  const country = document.getElementById('su_country').value;
+  const req = countryIDRequirements[country] || countryIDRequirements['Other'];
+  const select = document.getElementById('kyc_idType');
+  select.innerHTML = '<option value="">Select ID type</option>' + req.types.map(t=>`<option>${t}</option>`).join('');
+  const box = document.getElementById('idReqBox');
+  box.innerHTML = `<h4>📋 ${country} — Accepted Identification</h4><ul>${req.docs.map(d=>`<li>${d}</li>`).join('')}</ul>`;
+}
+
+function updateIDTypeField(){ /* placeholder for dynamic updates */ }
+
+function toggleFundingSection(){
+  const bank = document.getElementById('fundBank').checked;
+  document.getElementById('bankSection').style.display = bank ? 'block' : 'none';
+}
+
+function handleFileUpload(type){
+  const input = document.getElementById('kyc_'+type+'File');
+  const file = input.files[0];
+  if(!file) return;
+  if(file.size > 10*1024*1024){ toast('File too large (max 10MB)','error'); return; }
+  uploadedFiles[type] = { name: file.name, size: file.size, type: file.type };
+  const area = document.getElementById(type+'UploadArea');
+  area.classList.add('has-file');
+  const nameEl = document.getElementById(type+'FileName');
+  nameEl.textContent = '✓ ' + file.name;
+  nameEl.style.display = 'block';
+  toast('File uploaded: '+file.name,'success');
+}
+
+function goStep(n){
+  // Validate current step before proceeding
+  if(n > currentStep){
+    if(!validateStep(currentStep)) return;
+  }
+  // Hide all
+  for(let i=1;i<=5;i++) document.getElementById('step'+i).style.display='none';
+  document.getElementById('step'+n).style.display='block';
+  // Update indicators
+  for(let i=1;i<=5;i++){
+    const el = document.getElementById('st'+i);
+    el.classList.remove('active','done');
+    if(i < n) el.classList.add('done');
+    if(i === n) el.classList.add('active');
+  }
+  currentStep = n;
+  if(n===5) renderReview();
+  window.scrollTo(0,0);
+}
+
+function validateStep(s){
+  if(s===1){
+    const name = document.getElementById('su_fullname').value.trim();
+    const email = document.getElementById('su_name').value.trim();
+    const pass = document.getElementById('su_pass').value;
+    if(!name){ toast('Please enter your full name','error'); return false; }
+    if(!email || !email.includes('@')){ toast('Please enter a valid email','error'); return false; }
+    if(pass.length<6){ toast('Password must be at least 6 characters','error'); return false; }
+  }
+  if(s===2){
+    const country = document.getElementById('su_country').value;
+    if(!country){ toast('Please select your country','error'); return false; }
+    if(!document.getElementById('kyc_idType').value){ toast('Please select an ID type','error'); return false; }
+    if(!uploadedFiles.id){ toast('Please upload your government ID','error'); return false; }
+  }
+  if(s===3){
+    if(!document.getElementById('kyc_employment').value){ toast('Please select employment status','error'); return false; }
+    if(!document.getElementById('kyc_income').value){ toast('Please select income range','error'); return false; }
+  }
+  return true;
+}
+
+function renderReview(){
+  const fields = [
+    ['Language', I18N[selectedLang]? I18N[selectedLang]._name : selectedLang],
+    ['Full name', document.getElementById('su_fullname').value],
+    ['Email', document.getElementById('su_name').value],
+    ['Country', document.getElementById('su_country').value],
+    ['Date of birth', document.getElementById('kyc_dob').value || 'Not provided'],
+    ['Phone', document.getElementById('kyc_phone').value || 'Not provided'],
+    ['Address', [document.getElementById('kyc_address').value, document.getElementById('kyc_city').value, document.getElementById('kyc_zip').value].filter(Boolean).join(', ') || 'Not provided'],
+    ['ID type', document.getElementById('kyc_idType').value || 'Not selected'],
+    ['ID document', uploadedFiles.id ? uploadedFiles.id.name : 'Not uploaded'],
+    ['Address proof', uploadedFiles.addr ? uploadedFiles.addr.name : 'Not provided'],
+    ['Employment', document.getElementById('kyc_employment').value || 'Not provided'],
+    ['Annual income', document.getElementById('kyc_income').value || 'Not provided'],
+    ['Net worth', document.getElementById('kyc_netWorth').value || 'Not provided'],
+    ['Experience', document.getElementById('kyc_expLevel').value || 'Not provided'],
+    ['Objectives', document.getElementById('kyc_objectives').value || 'Not provided'],
+    ['Risk tolerance', document.getElementById('kyc_riskTolerance').value || 'Not provided'],
+    ['Funding', document.getElementById('fundBank').checked ? 'Bank + Crypto' : 'Crypto only'],
+  ];
+  if(document.getElementById('fundBank').checked){
+    fields.push(['Bank name', document.getElementById('kyc_bankName').value || 'Not provided']);
+  }
+  document.getElementById('reviewSummary').innerHTML = '<table class="tbl" style="width:100%"><tbody>' +
+    fields.map(f=>`<tr><td style="padding:6px 8px;color:var(--text-2);font-weight:600;width:40%">${f[0]}</td><td style="padding:6px 8px">${f[1]||'—'}</td></tr>`).join('') +
+    '</tbody></table>';
+}
+
+function doSignup(){
+  if(!document.getElementById('agreeTerms').checked){ toast('Please agree to the Terms','error'); return; }
+  if(!document.getElementById('agreeKYC').checked){ toast('Please consent to KYC verification','error'); return; }
+
+  const name = document.getElementById('su_fullname').value;
+  const email = document.getElementById('su_name').value;
+  const password = document.getElementById('su_pass').value;
+  const country = document.getElementById('su_country').value;
+  const referral = document.getElementById('su_ref').value;
+
+  const kyc = {
+    firstName: document.getElementById('kyc_firstName').value,
+    lastName: document.getElementById('kyc_lastName').value,
+    dob: document.getElementById('kyc_dob').value,
+    phone: document.getElementById('kyc_phone').value,
+    address: document.getElementById('kyc_address').value,
+    city: document.getElementById('kyc_city').value,
+    zip: document.getElementById('kyc_zip').value,
+    idType: document.getElementById('kyc_idType').value,
+    idFileName: uploadedFiles.id ? uploadedFiles.id.name : '',
+    addrProofFile: uploadedFiles.addr ? uploadedFiles.addr.name : '',
+    employment: document.getElementById('kyc_employment').value,
+    income: document.getElementById('kyc_income').value,
+    netWorth: document.getElementById('kyc_netWorth').value,
+    expLevel: document.getElementById('kyc_expLevel').value,
+    objectives: document.getElementById('kyc_objectives').value,
+    riskTolerance: document.getElementById('kyc_riskTolerance').value,
+    fundingMethod: document.getElementById('fundBank').checked ? 'bank' : 'crypto',
+    bankName: document.getElementById('kyc_bankName')?.value || '',
+    bankStatementFile: uploadedFiles.bank ? uploadedFiles.bank.name : '',
+    submittedAt: Date.now()
+  };
+
+  const r = TV.signup({name,email,password,country,referral,lang:selectedLang,kyc});
+  if(!r.ok){ toast(r.error,'error'); return; }
+
+  // If bank link was provided, submit it
+  if(document.getElementById('fundBank').checked && document.getElementById('kyc_acctNum')?.value){
+    TV.requestBankLink(r.user.id, document.getElementById('kyc_bankName').value, document.getElementById('kyc_acctNum').value, document.getElementById('kyc_routingNum').value);
+  }
+
+  toast('Application submitted! $130 bonus credited. Your account is pending verification. 🎉','success');
+  notifyEmail(r.user.id, TV.welcomeEmailSubject(selectedLang), TV.welcomeEmailBody(selectedLang, name));
+  setTimeout(()=>location.href='dashboard.html', 1800);
+}
+
+// Init
 document.getElementById('nav').innerHTML = navHTML();
 initTheme(); updateThemeToggle(); applyI18n();
-// Auto-fill referral code from URL (?ref=CODE)
+buildLangPicks();
+
+// Auto-fill referral code from URL
 (function(){
   const params = new URLSearchParams(location.search);
   const ref = params.get('ref');
@@ -48,21 +482,6 @@ initTheme(); updateThemeToggle(); applyI18n();
     document.getElementById('refBanner').style.display = 'inline-flex';
   }
 })();
-function doSignup(e){
-  e.preventDefault();
-  const name = document.getElementById('su_fullname').value;
-  const email = document.getElementById('su_name').value;
-  const password = document.getElementById('su_pass').value;
-  const country = document.getElementById('su_country').value;
-  const referral = document.getElementById('su_ref').value;
-  if(password.length<6){ toast('Password must be at least 6 characters','error'); return false; }
-  const r = TV.signup({name,email,password,country,referral});
-  if(!r.ok){ toast(r.error,'error'); return false; }
-  toast('Account created! $130 bonus credited 🎉','success');
-  notifyEmail(r.user.id, 'Welcome to TradeVerse', `Hi ${r.user.name}, your account is ready and you received a $130 promotional credit.`);
-  setTimeout(()=>location.href='dashboard.html', 1200);
-  return false;
-}
 </script>
 </body>
 </html>
